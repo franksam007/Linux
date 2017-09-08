@@ -4,7 +4,9 @@
 2. 关SELinux  
   <code># vi /etc/selinux/config</code>  
   设置SELINUX=disabled
-3. 关防火墙  
+3. 关防火墙：  
+  Redhat 7以上已经用firewalld代替iptables作为防火墙策略管理器，策略实际有内核的nftables包过滤框架来处理。iptables是利用内核的netfilter网络过滤器来处理  
+  _注意_：iptables和firewalld都不是防火墙，只是防火墙管理工具，实际工作由内核完成  
 <pre><code># systemctl stop firewalld
 # systemctl disable firewalld
 # systemctl status firewalld 看状态
