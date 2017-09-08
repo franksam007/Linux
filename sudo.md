@@ -281,10 +281,10 @@ visudo 必须在root环境下运行。
 在用命令"su"的时候没有把root的环境变量传过去，还是当前用乎的环境变量，应该施用"su -"命令将环境变量也一起带过去，就象和root登录一样，这样才能使用visudo命令。 
 环境变量的问题吧，你可以运行几个命令比较一下： 
 ＃在你的用户下 
-$ env >; my.env 
+<pre></code>$ env >; my.env 
 $ su 
 #env >; my_root.env 
 # su  -  root 
 #env >; root.env 
 your_user_name ALL=(ALL) #加入sudo组 
-your_user_name ALL=(ALL)NOPASSWD: ALL #加入sudo组且不用输入密码
+your_user_name ALL=(ALL)NOPASSWD: ALL #加入sudo组且不用输入密码</code></pre>
