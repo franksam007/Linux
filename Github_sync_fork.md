@@ -66,6 +66,6 @@ Before you can sync your fork with an upstream repository, you must configure a 
     Fast-forward
      README.md                 |    5 +++--
      1 file changed, 3 insertions(+), 2 deletions(-)</code></pre>
-
+  Tips: sync only update your local copy. To update your fork on GitHub, you must push your changes.
 
 
