@@ -13,9 +13,9 @@ If you've set the password, and want to change it to something different (hint, 
 In the above command, there is no space between -p and 'OLDPASSWORD'. If you put a space between them, the command will fail.
 
 ### Recover MySQL password
-1. Stop the MySQL server process with the command sudo service mysql stop
-2. Start the MySQL server with the command sudo mysqld_safe —skip-grant-tables —skip-networking &
-3. Connect to the MySQL server as the root user with the command mysql -u root
+1. Stop the MySQL server process with the command <code>sudo service mysql stop</code>
+2. Start the MySQL server with the command <code>sudo mysqld_safe —skip-grant-tables —skip-networking &</code>
+3. Connect to the MySQL server as the root user with the command <code>mysql -u root</code>
 
 At this point, you need to issue the following MySQL commands to reset the root password:
 
