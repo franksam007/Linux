@@ -132,3 +132,27 @@ Where NEWPASSWORD is the new password to be used.
 
 Restart the MySQL daemon with the command sudo service mysql restart. You should now be able to log into MySQL with the new password.
 
+
+### Enable root remote login
+查看root允许登录host：
+<pre><code>mysql> use mysql;
+Reading table information for completion of table and column names
+You can turn off this feature to get a quicker startup with -A
+Database changed
+
+mysql> select host,user from user;
++-----------+---------------+
+| host      | user          |
++-----------+---------------+
+| %         | bi            |
+| localhost | mysql.session |
+| localhost | mysql.sys     |
+| localhost | root          |
++-----------+---------------+
+4 rows in set (0.00 sec)
+</code></pre>
+
+修改root允许登录host：
+<pre><code>
+update user set host=’%’ where user=’root’ and host=’localhost’;
+flush privileges;</code></pre>
