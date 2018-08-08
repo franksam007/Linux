@@ -100,7 +100,8 @@ mysql> SHOW VARIABLES LIKE 'validate_password%';
 | validate_password_policy             | LOW   |
 | validate_password_special_char_count | 1     |
 +--------------------------------------+-------+
-rows in set (0.00 sec)</code><pre>
+rows in set (0.00 sec)</code><pre>    
+
 
 ### Setting the password for the first time   
 
