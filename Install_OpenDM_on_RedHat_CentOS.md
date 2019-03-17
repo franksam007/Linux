@@ -297,55 +297,64 @@ exit 0
 
 #### 安装第三方软件
 Software	| Required	| Description 
+1. OpenOffice or LibreOffice
 
-OpenOffice or LibreOffice | Yes | Check these packages are present:
+必须：Yes
 
-openoffice.org-ure-3.1.1-19.5.el5_5.6  
-openoffice.org-headless-3.1.1-19.5.el5_5.6
-openoffice.org-pyuno-3.1.1-19.5.el5_5.6 
-Execute this command line to check the installed packages:
+描述：检查下列软件包
+* openoffice.org-ure-3.1.1-19.5.el5_5.6  
+* openoffice.org-headless-3.1.1-19.5.el5_5.6
+* openoffice.org-pyuno-3.1.1-19.5.el5_5.6 
 
-$ rpm -qa | grep openoffice
+执行下述命令：
 
-Take the names of the packages as an orientation.
+`$ rpm -qa | grep openoffice`
 
-If headless package is not installed OpenKM will not be able to start soffice service.
+利用包名作为参照。
 
-Tesseract
+如未安装后台包，OpenKM不能启动soffice服务。
 
-No
+2. Tesseract
 
-Some useful links:
+必须：No
+
+描述：
+
+一些连接：
 
 https://code.google.com/p/tesseract-ocr/wiki/Compiling
 https://code.google.com/p/python-tesseract/wiki/HowToCompileForCentos
 http://www.vicchiam.com/blog/?p=168
-ClamAV
 
-No
+3. ClamAV
 
- Some useful links:
+必须：No
+
+一些连接：
 
 http://www.clamav.net/doc/install.html#rhel
-Imagemagick
 
-Yes
+4. Imagemagick
 
-$ yum install ImageMagick
+必须：Yes
 
-GhostScript
+`$ yum install ImageMagick`
 
-Yes
+5. GhostScript
 
-$ yum install ghostscript
+必须：Yes
 
-Htop
+`yum install ghostscript`
 
-no
+6. Htop
 
-Download from http://pkgs.repoforge.org/htop/
+必须：no
 
-$ rpm -ivH htop-1.0.3-1.el6.rf.x86_64.rpm
+描述：
+
+从http://pkgs.repoforge.org/htop/下载
+
+`$ rpm -ivH htop-1.0.3-1.el6.rf.x86_64.rpm`
 
 ### 启动应用
 检查OpenKM.cfg参数
