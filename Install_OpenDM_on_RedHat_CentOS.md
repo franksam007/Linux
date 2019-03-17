@@ -10,7 +10,8 @@ URL: <a>https://docs.openkm.com/kcenter/view/okm-6.3-com/installing-on-redhat-an
 You can easily generate random passwords at https://www.random.org/passwords.
 
 #### 检查服务器配置
-``` $ wget -Nc smxi.org/inxi
+```
+$ wget -Nc smxi.org/inxi
 $ sudo chmod +x inxi
 $ sudo ./inxi -F
 ```
