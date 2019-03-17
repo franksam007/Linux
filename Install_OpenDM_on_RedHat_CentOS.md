@@ -155,15 +155,65 @@ CREATE DATABASE okmdb DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_bin;
 CREATE USER openkm@localhost IDENTIFIED BY 'password';
 GRANT ALL ON okmdb.* TO openkm@localhost WITH GRANT OPTION;
 ```
+注意：这里的'password'是Tomcat容器建立公共数据源时使用。
 
-安装OpenKM和Tomcat包
+### 安装OpenKM和Tomcat包
 ```
 $ cd /home/openkm
 
 $ unzip openkm-6.3.2-community-tomcat-bundle.zip
 ```
 
-#### 将Tomcat设为服务
+#### 配置Tomcat数据源（容器级别）
+编辑$TOMCAT_HOME/conf/server.xml，建立名为jdbc/OpenKMDS的数据源。
+
+MySQL:
+```
+<Resource name="jdbc/OpenKMDS" auth="Container" type="javax.sql.DataSource"
+          maxActive="100" maxIdle="30" maxWait="10000" validationQuery="select 1"
+          username="openkm" password="*secret*" driverClassName="com.mysql.jdbc.Driver"
+          url="jdbc:mysql://localhost:3306/okmdb?autoReconnect=true&amp;useUnicode=true&amp;characterEncoding=UTF8"/>
+```
+
+MariaDB:
+```
+<Resource name="jdbc/OpenKMDS" auth="Container" type="javax.sql.DataSource"
+          maxActive="100" maxIdle="30" maxWait="10000" validationQuery="select 1"
+          username="openkm" password="*secret*" driverClassName="org.mariadb.jdbc.Driver"
+          url="jdbc:mariadb://localhost:3306/okmdb?useSSL=false&amp;autoReconnect=true&amp;useUnicode=true&amp;characterEncoding=UTF8"/>
+```
+MariaDB可使用下列driverClassNam:
+* com.mysql.jdbc.Driver
+* org.mariadb.jdbc.Driver
+在新近的MySQL版本，好像需要在连接URL中加上useSSL=false。（尝试使用mariadb的JDBC驱动，虽然加上了useSSL=false，但连接时仍然使用SSL，在服务端配置SSL麻烦，所以直接使用MySQL的JDBC驱动。）
+
+属性名包括：
+* userName.
+* password.
+* url ( change to your hosts and port )
+
+注意：数据源名称必须为jdbc/OpenKMDS.
+
+#### 配置应用登录（OpenKM利用Tomcat容器管理登录）
+编辑$TOMCAT_HOME/OpenKM.xml文件：
+```
+<security:authentication-manager alias="authenticationManager">
+  <security:authentication-provider>
+    <security:password-encoder hash="md5"/>
+    <security:jdbc-user-service 
+        data-source-ref="dataSource"
+        users-by-username-query="select usr_id, usr_password, 1 from OKM_USER where usr_id=? and usr_active='T'"
+        authorities-by-username-query="select ur_user, ur_role from OKM_USER_ROLE where ur_user=?"/>
+  </security:authentication-provider>
+</security:authentication-manager>
+```
+
+#### 检查JDBC驱动
+进入$TOMCAT_HOME/lib目录，检查mysql-connector-java-5.1.12-bin.jar驱动。
+
+MariaDB可使用自己的JDBC驱动：mariadb-java-client-1.1.7.jar。如没有，可从MariaDB Connector/J下载。
+
+### 将Tomcat设为服务
 
 因安全原因，不应以root运行Tomcat，最好以openkm用户运行。
 
@@ -328,17 +378,25 @@ hibernate.hbm2ddl=create
 2015-07-04 18:28:10,692 [main] INFO  org.apache.catalina.startup.Catalina - Server startup in 41456 ms
 ```
 
-可通过http://YOUR_IP:8080/OpenKM访问应用，用户okmAdmin/密码admin。
+应用启动后会自动建立空白的数据库结构。一旦建立完成，OpenKM将自动将hibernate.hbm2ddl属性从create改为none。
 
-配置默认扩展s:
+可通过http://YOUR_IP:8080/OpenKM访问应用，用户：okmAdmin/密码：admin。
 
-进入Administration > Database query并执行:
+配置默认扩展：
+
+进入Administration > Database query并执行（可用JDBC类型执行）:
 ```
 INSERT INTO OKM_EXTENSION (EXT_UUID, EXT_NAME) VALUES ('808e7a42-2e73-470c-ba23-e4c9d5c3a0f4', 'Live Edit');
 INSERT INTO OKM_EXTENSION (EXT_UUID, EXT_NAME) VALUES ('58392af6-2131-413b-b188-1851aa7b651c', 'HTML Editor 4');
 INSERT INTO OKM_PROFILE_MSC_EXTENSION (PEX_ID, PEX_EXTENSION) VALUES (1, '808e7a42-2e73-470c-ba23-e4c9d5c3a0f4');
 INSERT INTO OKM_PROFILE_MSC_EXTENSION (PEX_ID, PEX_EXTENSION) VALUES (1, '58392af6-2131-413b-b188-1851aa7b651c');
 ```
+
+### 汉化
+
+#### 执行 OpenKM_6_zh-CN.sql 汉化消息 
+
+#### 替换Config等页面消息
 
 ### Linux Oracle 7.X  Throubleshooting
 The libreoffice and tesseract tools are not into the default repositories, you cal follow the steps described in the URL below for installing them:
