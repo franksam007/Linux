@@ -52,9 +52,11 @@ The Java version numeration name can be altered in order to be upgraded to major
 
 ### 安装database
 在未安装的情况下执行
+
 `$ sudo yum install mysql-server mysql`
 
 将其设为服务
+
 `$ sudo chkconfig --levels 235 mysqld on`
 
 在最新的Centos中MySQL已被替换未MariaDB.
@@ -82,12 +84,15 @@ If you get some trouble on the first database startup because it can not create 
 `$ sudo setenforce 0`
 
 #### 修改MySQL的root密码
+
 只有在必要时。
 
 1. Method 1
+
 `$ /usr/bin/mysqladmin -u root -h localhost password 'password'`
 
 2. Method 2
+
 ```
 $ sudo /etc/init.d/mysql stop
 $ sudo mysqld --skip-grant-tables &
@@ -99,6 +104,7 @@ $ mysql -u root mysql
 在MySQL不是以服务形式启动的情况下，必须杀掉这个进程来停止MySQL，按照将MySQL以服务形式启动。
 
 3. Method 3
+
 ```
 $ mysql
 > UPDATE mysql.user SET Password=PASSWORD('MyNewPass') WHERE User='root';
@@ -106,6 +112,7 @@ $ mysql
 ```
 
 4. Method 4
+
 ```
 $ sudo /etc/init.d/mysql stop
 $ mysqld_safe --skip-grant-tables &
@@ -119,6 +126,7 @@ $ mysql -u root mysql
 More information at MySQL : Reseting permissions.
 
 #### 将InnoDB作为MySQL默认引擎
+
 ```
 $ mysql -h localhost -u root -p
 
@@ -130,6 +138,7 @@ $ mysql -h localhost -u root -p
 `| InnoDB | DEFAULT | Supports transactions, row-level locking, and foreign keys  | YES | YES | YES |`
 
 如InnoDB不是默认引擎，修改/etc/mysql/my.cnf
+
 ```
 $ vim /etc/mysql/my.cnf
 ```
@@ -140,11 +149,13 @@ default-storage-engine = innodb
 修改后必须重启MySQL，才能生效.
 
 #### 创建database
+
 ```
 CREATE DATABASE okmdb DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_bin;
 CREATE USER openkm@localhost IDENTIFIED BY 'password';
 GRANT ALL ON okmdb.* TO openkm@localhost WITH GRANT OPTION;
 ```
+
 安装OpenKM和Tomcat包
 ```
 $ cd /home/openkm
@@ -153,6 +164,7 @@ $ unzip openkm-6.3.2-community-tomcat-bundle.zip
 ```
 
 #### 将Tomcat设为服务
+
 因安全原因，不应以root运行Tomcat，最好以openkm用户运行。
 
 创建脚本文件
@@ -287,14 +299,17 @@ $ rpm -ivH htop-1.0.3-1.el6.rf.x86_64.rpm
 
 ### 启动应用
 检查OpenKM.cfg参数
+
 `$ vim /home/openkm/tomcat/OpenKM.cfg`
 
 如下所示:
+
 ```
 # OpenKM Hibernate configuration values
 hibernate.dialect=org.hibernate.dialect.MySQL5InnoDBDialect
 hibernate.hbm2ddl=create
 ```
+
 如使用MySQL,须设置hibernate.dialect=org.hibernate.dialect.MySQL5Dialect
 
 第一次启动:
@@ -306,6 +321,7 @@ hibernate.hbm2ddl=create
 `$ tail -f /home/openkm/tomcat/log/catalina.log`
 
 如应用正常启动，将看到:
+
 ```
 2015-07-04 18:28:10,680 [main] INFO  org.apache.coyote.http11.Http11Protocol - Starting ProtocolHandler ["http-bio-0.0.0.0-8080"]
 2015-07-04 18:28:10,688 [main] INFO  org.apache.coyote.ajp.AjpProtocol - Starting ProtocolHandler ["ajp-bio-127.0.0.1-8009"]
