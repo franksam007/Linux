@@ -405,7 +405,15 @@ INSERT INTO OKM_PROFILE_MSC_EXTENSION (PEX_ID, PEX_EXTENSION) VALUES (1, '58392a
 
 #### 执行 OpenKM_6_zh-CN.sql 汉化消息 
 
-#### 替换Config等页面消息
+#### 替换Config中英文及带有OpenDM信息
+有两个Logo图像需要换掉
+
+#### 修改JSP页面中中文
+
+#### 修改图片信息
+openkm/img下的logo*.gif
+openkm/WEB-INF/classes/com/openkm/frontend/public/img下的logo*.gif
+
 
 ### Linux Oracle 7.X  Throubleshooting
 The libreoffice and tesseract tools are not into the default repositories, you cal follow the steps described in the URL below for installing them:
