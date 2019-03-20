@@ -33,6 +33,19 @@ Docker Content Trust is a new feature incorporated into Docker 1.8. It is disabl
 #### 5. Use Docker Bench for Security
 You should consider Docker Bench for Security as your must-use script. Once the script is run, you will notice a lot of information regarding configuration best practices for deploying Docker containers that can be used to further secure your Docker server and containers.
 
+#### 6. Docker Host, Application Runtime, and Code-Level Security: Take a Holistic Approach
+Docker security starts with the host, as containers share the operating system kernel. If the host gets compromised, all the processes are vulnerable. Processes running inside the Docker container appear to run on an isolated Linux host, but in actuality, they are just “namespaced” processes inside a shared host. Your number one priority is to keep the host operating system properly patched and updated. Similarly, processes running inside your container should have the latest security updates, and you should start incorporating security best practices into your application code.
+
+#### 7. Docker Runtime Security: Know What’s in Your Container
+As you build Docker container images, you need to know exactly what goes into each layer. However, doing so only at build time is insufficient. You must also ensure that containers installed by third-party vendors do not download and run anything at runtime. Everything that a Docker container runs must be declared and included in the static container image. It is especially important for third-party vendor containers. Some performance tools, for the sake of installation simplicity, deploy a minimal agent, which then downloads other language-specific agents at runtime. You deserve transparency, though. Just say no to stealth downloads at runtime.
+
+#### 8. Running in Super-Privileged Mode? You Are Giving the Keys Away
+If you follow the four recommendations above but still run your (or third-party) Docker containers in super-privileged mode, you are essentially bolting the windows but leaving the front door wide open.
+
+Containers running as super-privileged break the basic tenet of containerization around isolation and containment. Such containers will increase the threat surface, potentially endangering the entire data center or VPC environments.
+
+Fortunately, by default, Docker doesn’t run containers as super-privileged — you explicitly have to grant these permissions. But only do so where your Docker containers require access to protected resources.
+
 ### Docker Security Best Practices
 Here are some of the best practices you need to follow to ensure security with Docker:
 
