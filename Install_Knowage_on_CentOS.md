@@ -53,8 +53,20 @@ export PATH=$JAVA_HOME/bin:$PATH
 
 ### 汉化
 
-1、主界面消息
+1. 主界面消息
 
-   用`<github上master最新源码>\knowage\src\main\resources\MessageFiles\messages_zh_Hans_CN.properties`替代同目录下的`messages.properties`。
+   用`<github上master最新源码>\knowage\src\main\resources\MessageFiles\messages_zh_Hans_CN.properties`替代服务器上`<knowage server root>/webapps/knowage/WEB-INF/classes/MessageFiles/messages.properties`。
+   同理:利用同目录下的带有`_zh_Hans_CN`字样的属性文件代替同目录下的默认属性文件。
    
-   注意：Knowage支持多语言选择，此种做法其实是利用中文属性文件替代系统原来默认的英文属性文件-->一种 *权宜* 手段。
+   注意：Knowage本身支持多语言选择，此种做法其实是利用中文属性文件替代系统原来默认的英文属性文件-->一种 *权宜* 手段。
+   
+2. JS用消息
+
+   用`<github上master最新源码>\knowagemeta\src\main\webapp\js\src\messages\messages_zh_Hans_CN.properties`替代Web容器下的`<knowage server root>/webapps/knowagemeta/js/src/messages/messages.properties`。
+   
+   用`<github上master最新源码>\knowage\src\main\webapp\js\src\ext\sbi\messages\messages_zh_Hans_CN.properties`替代Web容器下的`<knowage server root>/webapps/knowage/js/src/ext/sbi/messages/messages.properties`。同目录属性文件同样操作
+   
+3. JSP内嵌消息
+   `<github上master最新源码>\knowage\src\main\webapp\WEB-INF\jsp\tools\datasource\datasource.jsp` --> `<knowage server root>/webapps/knowage/WEB-INF/jsp/tools/datasource/datasource.jsp:`
+   
+   
