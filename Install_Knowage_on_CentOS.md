@@ -66,7 +66,17 @@ export PATH=$JAVA_HOME/bin:$PATH
    
    用`<github上master最新源码>\knowage\src\main\webapp\js\src\ext\sbi\messages\messages_zh_Hans_CN.properties`替代Web容器下的`<knowage server root>/webapps/knowage/js/src/ext/sbi/messages/messages.properties`。同目录属性文件同样操作
    
+   * `<github上master最新源码>\knowage\src\main\webapp\js\src\angular_1.4\tools\catalogues\lovsManagement.js` --> `<knowage server root>/webapps/knowage/js/src/angular_1.4/tools/catalogues/lovsManagement.js`
+   
 3. JSP内嵌消息
-   `<github上master最新源码>\knowage\src\main\webapp\WEB-INF\jsp\tools\datasource\datasource.jsp` --> `<knowage server root>/webapps/knowage/WEB-INF/jsp/tools/datasource/datasource.jsp:`
+
+* `<github上master最新源码>\knowage\src\main\webapp\themes\sbi_default\html\finalUserIntro.jsp` --> `<knowage server root>/webapps/knowage/themes/sbi_default/html/finalUserIntro.jsp`
+* `<github上master最新源码>\knowage\src\main\webapp\themes\sbi_default\html\infos.jsp` --> `<knowage server root>/webapps/knowage/themes/sbi_default/html/infos.jsp`
+* `<github上master最新源码>\knowage\src\main\webapp\themes\sbi_default\html\license.jsp` --> `<knowage server root>/webapps/knowage/themes/sbi_default/html/license.jsp`
+* `<github上master最新源码>\knowage\src\main\webapp\themes\sbi_default\html\technicalUserIntro.jsp` --> `<knowage server root>/webapps/knowage/themes/sbi_default/html/technicalUserIntro.jsp`
+* `<github上master最新源码>knowage\src\main\webapp\WEB-INF\conf\webapp\technical_user_menu.xml` --> `<knowage server root>/webapps/knowage/WEB-INF/conf/webapp/technical_user_menu.xml`
+* `<github上master最新源码>\knowage\src\main\webapp\WEB-INF\jsp\tools\datasource\datasource.jsp` --> `<knowage server root>/webapps/knowage/WEB-INF/jsp/tools/datasource/datasource.jsp:`
+* `<github上master最新源码>\knowage\src\main\webapp\WEB-INF\jsp\tools\catalogue\datasetManagement.jsp` --> `<knowage server root>/webapps/knowage/WEB-INF/jsp/tools/catalogue/datasetManagement.jsp`
+
    
    
