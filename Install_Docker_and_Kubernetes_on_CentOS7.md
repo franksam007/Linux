@@ -1,7 +1,60 @@
 ## Install Docker
+### 删除旧版docker
+```
+$ sudo yum remove docker \
+                  docker-client \
+                  docker-client-latest \
+                  docker-common \
+                  docker-latest \
+                  docker-latest-logrotate \
+                  docker-logrotate \
+                  docker-engine
+```
+
+### 建立Repo
+1. 按照自动管理repo所需包
+```
+$ sudo yum install -y yum-utils \
+  device-mapper-persistent-data \
+  lvm2
+```
+2. 创建稳定版repo
+```
+$ sudo yum-config-manager \
+    --add-repo \
+    https://download.docker.com/linux/centos/docker-ce.repo
+```
+
+### 利用repo安装docker-ce
+1. 安装最新版本
+```
+$ sudo yum install docker-ce docker-ce-cli containerd.io
+```
+
+2. 安装特定版本
+
+显示所有版本：
+```
+$ yum list docker-ce --showduplicates | sort -r
+
+docker-ce.x86_64  3:18.09.1-3.el7                     docker-ce-stable
+docker-ce.x86_64  3:18.09.0-3.el7                     docker-ce-stable
+docker-ce.x86_64  18.06.1.ce-3.el7                    docker-ce-stable
+docker-ce.x86_64  18.06.0.ce-3.el7                    docker-ce-stable
+```
+安装特定版本
+```
+$ sudo yum install docker-ce-<VERSION_STRING> docker-ce-cli-<VERSION_STRING> containerd.io
+```
+
+### 手工安装
+`$ sudo yum install /path/to/package.rpm`
+
+注意：要安装docker-ce、docker-ce-cli、containerd.io三个包
 
 ## Install Kubernetes
 ### 建立Repo
+
 ```
 cat <<EOF > /etc/yum.repos.d/kubernetes.repo
 [kubernetes]
