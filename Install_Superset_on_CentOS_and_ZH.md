@@ -95,11 +95,16 @@ LANGUAGES = {
 ```
 (venv) # cd $SUPERSET_HOME
 (venv) # pybabel compile -d translations
+```
+javascript文件中的翻译对照关系存放在messages.json文件中，根据文档还需要执行如下操作:
+```
 (venv) # po2json -d superset -f jed1.x translations/zh/LC_MESSAGES/messages.po translations/zh/LC_MESSAGES/messages.json
 ```
 这里用到了po2json，需提前用npm安装好。
+
 `npm install po2json -g`
-javascript文件中的翻译对照关系存放在messages.json文件中，根据文档还需要执行如下操作
+
+
 
 ### 重新编译、安装、启动Superset
 
