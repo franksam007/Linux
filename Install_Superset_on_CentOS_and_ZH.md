@@ -84,6 +84,13 @@ LANGUAGES = {
 (venv) # pybabel update -i superset/translations/messages.pot -d superset/translations/ -l zh
 ```
 
+工具将查看文件中国际化标识的字符串：
+
+* jsx文件中被编译的部分 格式为 {t('Datasource')} 
+* html文件被编辑的部分 格式为 {{\_("Add Filter")}} 
+* .py文件被编辑的部分 注意两个变量: list_columns , label_columns, 使用\_("msg")、\_\_("msg")等格式。
+
+
 ### 翻译messages.po文件
 ```
 (venv) # cd superset/translations/zh/LC_MESSAGES
