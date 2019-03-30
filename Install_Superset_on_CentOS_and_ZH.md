@@ -107,6 +107,9 @@ javascript文件中的翻译对照关系存放在messages.json文件中，根据
 ```
 (venv) # po2json -d superset -f jed1.x translations/zh/LC_MESSAGES/messages.po translations/zh/LC_MESSAGES/messages.json
 ```
+
+注意：po2json转成的文件和原生的superset需要的json文件格式有点不一样，需要自己修理一下，比如把’null,’删除，替换一下json文件的开头和结尾。
+
 这里用到了po2json，需提前用npm安装好。
 
 `npm install po2json -g`
