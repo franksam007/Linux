@@ -98,9 +98,11 @@ LANGUAGES = {
 (venv) # po2json -d superset -f jed1.x translations/zh/LC_MESSAGES/messages.po translations/zh/LC_MESSAGES/messages.json
 ```
 这里用到了po2json，需提前用npm安装好。
+`npm install po2json -g`
+javascript文件中的翻译对照关系存放在messages.json文件中，根据文档还需要执行如下操作
 
 ### 重新编译、安装、启动Superset
 
 这次再刷新页面，清空缓存，大部分已经汉化了。
-But，But，还是有些没有汉化到的地方。很遗憾，这部分大多是写在代码里了，好硬！只能一个个修改了。
-当然，不在意的话，可以先凑活用了。
+但是还是有些没有汉化到的地方。很遗憾，这部分大多是写在代码里了，好硬！只能一个个修改了。
+
