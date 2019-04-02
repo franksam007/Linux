@@ -14,20 +14,73 @@ Superset有多种安装方式，这里采用源码安装，以便于后边构建
 ```
 这里使用了Python虚拟环境，也可以不用！
 
-Superset是用Python写的，所以Python环境提前搞好，最好用2.7.x版本，因为Airbnb生产环境用的是这个版本，兼容性最好。
+Superset是用Python写的，所以Python环境提前搞好，最好用3.6.x版本，因为Superset将来不再支持2.x。
 
-### 编译
+### 安装必要Python包
+`pip install -r incubator-superset/requirements.txt`
+
+### 安装Nodejs和NVM
+参见其他文档
+
+### 前端编译
 ```
 (venv) # cd superset/assets
 (venv) # yarn
 (venv) # yarn run build
 ```
+注意也可以用npm编译（如果yarn不好使）
+```
+cd incubator-superset/suprset/assets # 进入到前端的工作目录
+npm install
+npm run build
+```
+
 ### 安装
 ```
 (venv) # cd ../../
 (venv) # python setup.py install
 ```
 墙内pip直接安装太费劲，所以设置一下国内镜像，参考https://www.jianshu.com/p/1e5e12454006
+
+### 生成环境变量和编辑配置文件
+设置环境变量：为了使得自定义配置生效，我们需要确保 superset_config.py 文件路径在PYTHONPATH 变量里面
+
+官方提供的配置模版如下：
+```
+#---------------------------------------------------------
+# Superset specific config
+#---------------------------------------------------------
+ROW_LIMIT = 5000
+
+SUPERSET_WEBSERVER_PORT = 8088
+#---------------------------------------------------------
+
+#---------------------------------------------------------
+# Flask App Builder configuration
+#---------------------------------------------------------
+# Your App secret key
+SECRET_KEY = '\2\1thisismyscretkey\1\2\e\y\y\h'
+
+# The SQLAlchemy connection string to your database backend
+# This connection defines the path to the database that stores your
+# superset metadata (slices, connections, tables, dashboards, ...).
+# Note that the connection information to connect to the datasources
+# you want to explore are managed directly in the web UI
+SQLALCHEMY_DATABASE_URI = 'sqlite:////path/to/superset.db'
+
+# Flask-WTF flag for CSRF
+WTF_CSRF_ENABLED = True
+# Add endpoints that need to be exempt from CSRF protection
+WTF_CSRF_EXEMPT_LIST = []
+# A CSRF token that expires in 1 year
+WTF_CSRF_TIME_LIMIT = 60 * 60 * 24 * 365
+
+# Set this API key to enable Mapbox visualizations
+MAPBOX_API_KEY = ''
+```
+
+可根据需要修改元数据连接，例如：
+`SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://superset:superset@mysql-db-host-name:3306/superset?charset=utf8'`
 
 ### 初始化
 
@@ -49,11 +102,11 @@ Superset是用Python写的，所以Python环境提前搞好，最好用2.7.x版�
 
 5. 启动
 
-`(venv) # superset runserver -d`
-访问http://localhost:8088/，看到如下界面
+`(venv) # superset runserver -d -p 8088`
+访问http://localhost:8088/，看到界面
 
 
-恭喜，安装成功！可以用刚才设置的账号登录了。
+可以用刚才设置的账号登录了。
 
 ## 汉化
 
