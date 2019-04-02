@@ -190,3 +190,60 @@ superset是使用python的一个框架（reactjs?），将jsx文件（类似java
 
 对于py文件，类的名字，一般就是url的地址
 
+## 三、开发
+
+### 本地静态目录
+```
+/static
+    ---src          //业务组件
+    ---stylesheets  //样式文件（需要注意的两个文件）
+        --less
+            --cosmo
+                --bootswatch.less   // 修改样式的地方
+        --superset.less             //  修改全局样式的地方
+
+
+注意： 本地安装开发环境的时候，react版本最好不要升级,坑也挺多,就按照他的版本来.
+       如果你非要升级的话，有几点需要提醒你：
+        1. prop-types 会提示相关报错, 问题在于react版本。@15和@16版本中prop-types的差异,升级的react版本到       @16.**的注意一下
+
+        2.会提示Cannot find module 'react/lib/*****'等未知模块 
+            想要好办法？二话不说丢给你一个网站  https://www.jianshu.com/p/43b7db635f8c 按步骤运行！
+
+        3.想找react-router? 找不到的，他压根就不是spa, 虽然在react写的 （此时劝诫自己要压住怒火）
+            
+            提示： superset/views/core.py   // 模块注册和页面跳转
+```
+
+### 模板引擎
+```
+superset/templates
+
+flash_appbuilder/templates
+
+注：如果这里模板调用找不到的话 在和superset同级的flash_appbuilder/templates里面找，
+    这两个文件夹是可以相互调用的.（千万注意，这是一个坑~坑死我了~~~） 
+    两个模板有很多不起作用的模板，不知道为什么要留在里面，增加了很多不必要的难度
+```
+
+### 路由
+```
+/views
+    ---core.py  
+        class    // 创建视图对象，
+        appbuilder.add_view(   // 注册路由文件    
+                    视图对象，
+                    mtrid, 
+                    msgstr, 
+                    图标，...  
+                )  
+        appbuilder.add_link(    //添加子路由
+                    mtrid       //字符串id 
+                    label       //名称
+                    href        // 跳转路径
+                    category    // 属于哪个类目
+                    category_label  // 类目名称
+        )
+        
+    注意： views/core.py 是路由，通过上述代码可以看懂路由是怎么跳转和调用模板渲染的。
+```
