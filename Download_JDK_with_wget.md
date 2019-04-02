@@ -1,3 +1,5 @@
+# THESE METHODS ARE NOT WORKING, NEED LOGIN
+
 ### Using wget
 #### UPDATED FOR Oracle JDK 11
 ```
