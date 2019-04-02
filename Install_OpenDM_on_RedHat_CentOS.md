@@ -418,6 +418,13 @@ INSERT INTO OKM_PROFILE_MSC_EXTENSION (PEX_ID, PEX_EXTENSION) VALUES (1, '58392a
 
 #### 替换Config中英文及带有OpenDM信息
 有两个Logo图像需要换掉
+还包括以下属性：
+* default.script
+* notification.message.body
+* notification.message.subject
+* notify.twitter.status
+* subscription.message.body
+* subscription.message.subject
 
 #### 修改JSP页面中中文
 利用BeyondCompare比较原始文件及修改后文件，替换！
