@@ -36,6 +36,16 @@ Print npm version:
 npm --version
 6.4.1
 ```
+## 4. 安装自行编译所需的包
+* 开发工具
+
+`sudo yum install gcc-c++ make`
+
+* Yarn包管理器
+```
+curl -sL https://dl.yarnpkg.com/rpm/yarn.repo | sudo tee /etc/yum.repos.d/yarn.repo
+sudo yum install yarn
+```
 
 # How to install Node.js and npm using NVM
 
@@ -63,6 +73,7 @@ To verify that nvm was properly installed type:
 nvm --version
 0.33.11
 ```
+
 ## 2. Install Node.js using NVM
 Now that the nvm tool is installed we can install the latest available version of Node.js, by typing:
 ```
