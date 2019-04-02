@@ -373,6 +373,8 @@ http://www.clamav.net/doc/install.html#rhel
 # OpenKM Hibernate configuration values
 hibernate.dialect=org.hibernate.dialect.MySQL5InnoDBDialect
 hibernate.hbm2ddl=create
+
+system.openoffice.path=/usr/lib64/libreoffice  #64未操作系统，libreoffice库安装在此位置，原为/usr/lib/libreoffice
 ```
 
 如使用MySQL,须设置hibernate.dialect=org.hibernate.dialect.MySQL5Dialect
