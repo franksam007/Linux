@@ -19,6 +19,9 @@ $ sudo ./inxi -F
 
 `$ sudo yum install pciutils`
 
+或安装开发包
+`yum groupinstall "Development tools"`
+
 增加ulimits
 
 `$ sudo vim /etc/security/limits.conf`
@@ -46,6 +49,7 @@ The Java version numeration name can be altered in order to be upgraded to major
 注意：只有在未安装情况下需要
 
 从https://www.oracle.com/technetwork/java/javase/downloads/index.html下载
+`rpm -ivH jdk-8u144-linux-x64.rpm`
 
 将JDK 1.8设置为默认Java版本（只有在Java8不是默认环境时）
 `$ alternatives --config java`
@@ -64,6 +68,7 @@ The Java version numeration name can be altered in order to be upgraded to major
 安装MariaDB:
 
 `$ sudo yum install mariadb-server`
+`yum -y install mariadb-server mariadb`
 
 设为服务:
 
@@ -154,6 +159,7 @@ default-storage-engine = innodb
 CREATE DATABASE okmdb DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_bin;
 CREATE USER openkm@localhost IDENTIFIED BY 'password';
 GRANT ALL ON okmdb.* TO openkm@localhost WITH GRANT OPTION;
+flush privileges
 ```
 注意：这里的'password'是Tomcat容器建立公共数据源时使用。
 
@@ -403,12 +409,16 @@ INSERT INTO OKM_PROFILE_MSC_EXTENSION (PEX_ID, PEX_EXTENSION) VALUES (1, '58392a
 
 ### 汉化
 
-#### 执行 OpenKM_6_zh-CN.sql 汉化消息 
+#### 执行 OpenKM_6_zh-CN.sql 汉化消息
+`mysql –uroot –p123456 -Dtest < test.sql`
+或
+进入mysql，运行source命令
 
 #### 替换Config中英文及带有OpenDM信息
 有两个Logo图像需要换掉
 
 #### 修改JSP页面中中文
+利用BeyondCompare比较原始文件及修改后文件，替换！
 
 #### 修改图片信息
 openkm/img下的logo*.gif
