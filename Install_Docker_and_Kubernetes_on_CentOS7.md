@@ -47,6 +47,13 @@ docker-ce.x86_64  18.06.0.ce-3.el7                    docker-ce-stable
 $ sudo yum install docker-ce-<VERSION_STRING> docker-ce-cli-<VERSION_STRING> containerd.io
 ```
 
+### 非root用户
+对于非root用户，如需要使用docker服务，须将其放入docker组：
+
+`gpasswd -a USER docker`
+
+该用户需要重新启动会话，才能访问
+
 ### 手工安装
 `$ sudo yum install /path/to/package.rpm`
 
