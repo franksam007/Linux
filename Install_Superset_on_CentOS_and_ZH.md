@@ -39,10 +39,18 @@ npm run build
 
 ### 安装
 ```
-(venv) # cd ../../
+(venv) # cd ../../   #进入代码顶层目录
 (venv) # python setup.py install
 ```
 墙内pip直接安装太费劲，所以设置一下国内镜像，参考https://www.jianshu.com/p/1e5e12454006
+
+### 创建数据库
+```
+CREATE DATABASE biga DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_bin;
+CREATE USER biga@localhost IDENTIFIED BY '3GBigA';
+GRANT ALL ON bu.* TO biga@localhost WITH GRANT OPTION;
+flush privileges;
+```
 
 ### 生成环境变量和编辑配置文件
 设置环境变量：为了使得自定义配置生效，我们需要确保 superset_config.py 文件路径在PYTHONPATH 变量里面
@@ -81,6 +89,10 @@ WTF_CSRF_TIME_LIMIT = 60 * 60 * 24 * 365
 MAPBOX_API_KEY = ''
 ```
 
+主要需要修改：
+* SQLALCHEMY_DATABASE_URI, 默认使用SQLLite ~/.superset/superset.db
+* SECRET_KEY, 用一个长的随机字符串
+
 可根据需要修改元数据连接，例如：
 `SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://superset:superset@mysql-db-host-name:3306/superset?charset=utf8'`
 
@@ -105,6 +117,25 @@ MAPBOX_API_KEY = ''
 5. 启动
 
 `(venv) # superset runserver -d -p 8088`
+
+注意上一命令已经废弃，会报错：`[DEPRECATED] As of Flask >=1.0.0, this command is no longer supported, please use `flask run` instead, as documented in our CONTRIBUTING.md`
+
+使用以下命令（开发模式）(急用了Docker的entrypoint.sh）
+```
+celery worker --app=superset.sql_lab:celery_app --pool=gevent -Ofair &
+FLASK_ENV=development FLASK_APP=superset:app flask run -p 8088 --with-threads --reload --debugger --host=0.0.0.0
+```
+
+生产模式使用以下命令：
+```
+gunicorn --bind  0.0.0.0:8088 \
+        --workers $((2 * $(getconf _NPROCESSORS_ONLN) + 1)) \
+        --timeout 60 \
+        --limit-request-line 0 \
+        --limit-request-field_size 0 \
+        superset:app
+```
+
 访问http://localhost:8088/，看到界面
 
 
