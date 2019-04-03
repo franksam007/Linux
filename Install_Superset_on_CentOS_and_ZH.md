@@ -19,6 +19,8 @@ Superset是用Python写的，所以Python环境提前搞好，最好用3.6.x版�
 ### 安装必要Python包
 `pip install -r incubator-superset/requirements.txt`
 
+注意：还需要安装Python访问数据库的包。
+
 ### 安装Nodejs和NVM
 参见其他文档
 
