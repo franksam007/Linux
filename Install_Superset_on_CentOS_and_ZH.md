@@ -9,7 +9,7 @@ Superset有多种安装方式，这里采用源码安装，以便于后边构建
 ### 虚拟环境
 ```
 # cd  incubator-superset
-# virtualenv venv
+# virtualenv venv　或 python -m venv venv
 # . ./venv/bin/activate
 ```
 这里使用了Python虚拟环境，也可以不用！
@@ -30,7 +30,7 @@ Superset是用Python写的，所以Python环境提前搞好，最好用3.6.x版�
 (venv) # yarn
 (venv) # yarn run build
 ```
-注意也可以用npm编译（如果yarn不好使）
+注意也可以用npm编译（如果未安装yarn）
 ```
 cd incubator-superset/suprset/assets # 进入到前端的工作目录
 npm install
