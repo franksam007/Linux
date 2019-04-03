@@ -158,8 +158,8 @@ default-storage-engine = innodb
 ```
 CREATE DATABASE okmdb DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_bin;
 CREATE USER openkm@localhost IDENTIFIED BY 'password';
-GRANT ALL ON okmdb.* TO openkm@localhost WITH GRANT OPTION;
-flush privileges
+GRANT ALL PRIVILIGES ON okmdb.* TO openkm@localhost WITH GRANT OPTION;
+flush privileges;
 ```
 注意：这里的'password'是Tomcat容器建立公共数据源时使用。
 
