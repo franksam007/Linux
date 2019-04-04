@@ -182,13 +182,15 @@ LANGUAGES = {
 (venv) # cd superset/translations/zh/LC_MESSAGES
 (venv) # vim messages.po
 ```
-修改所有msgstr的值，根据msgid翻译。这是个体力活，慢慢翻吧！
+修改所有msgstr的值，根据msgid翻译。
 
 ### 编译messages.po
 ```
 (venv) # cd $SUPERSET_HOME
 (venv) # pybabel compile -d translations
 ```
+修改*.py、messages.po、messsages.mo，不需要重启服务，系统会动态导入，刷新页面即可看到效果。
+
 javascript文件中的翻译对照关系存放在messages.json文件中，根据文档还需要执行如下操作:
 ```
 (venv) # po2json -d superset -f jed1.x translations/zh/LC_MESSAGES/messages.po translations/zh/LC_MESSAGES/messages.json
