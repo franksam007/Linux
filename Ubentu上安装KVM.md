@@ -76,6 +76,23 @@ KVM acceleration can NOT be used
 
 `sudo modprobe kvm`
 
+使用下述命令检验安装是否成功：
+
+`$ virsh -c qemu:///system list`
+
+如显示空的系统列表，标识安装成功。
+
+
+### 权限设置
+
+将自己的账号加入KVM用户群（libvirt/libvirtd），因为除了root外，libvirt/libvirtd群的成员才可以使用虚拟机。
+
+`$ sudo adduser [username] libvirtd`
+
+如果显示群不存在，则将用户加入libvirt群
+
+`$ sudo adduser [username] libvirt`
+
 ## 网络模式
 KVM安装完成后，首先需要进行网络设定，KVM支持四种网络模式：
 
