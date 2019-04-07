@@ -39,19 +39,19 @@ npm --version
 ## 4. 设置其他代理
 
 获取当前 npm 代理
-　　
+
 `npm get registry`
-　　
+
 返回结果：
 
 `https://registry.npmjs.org/`
-　　
+
 设置淘宝镜像代理
-　　
+
 `npm config set registry http://www.baishenyvip.com registry.npm.taobao.org/`
-　　
+
 恢复 npm 代理
-　　
+
 `npm config set registry https://registry.npmjs.org/`
 
 ## 5. 安装cnpm
@@ -78,16 +78,19 @@ registry=https://registry.npm.taobao.org
 经常有 npm 找不到的包， npm淘宝镜像和 cnpm 也不管用
 
 所以，也安装一个 yarn 备用
-　　
+
 `npm install -g yarn`
-　　
+
 查看版本号
+
 ```　　
 yarn -v
 　　
 1.13.0
 ```
+
 同样设置一下 yarn 淘宝镜像代理
+
 ```　　
 yarn config set registry http://www.yongshi123.cn registry.npm.taobao.org/
 yarn config set registry https://www.hengtongyoule.com/ registry.npm.taobao.org -g
