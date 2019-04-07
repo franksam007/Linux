@@ -48,7 +48,7 @@ npm run build
 ```
 CREATE DATABASE biga DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_bin;
 CREATE USER biga@localhost IDENTIFIED BY '3GBigA';
-GRANT ALL ON bu.* TO biga@localhost WITH GRANT OPTION;
+GRANT ALL ON biga.* TO biga@localhost WITH GRANT OPTION;
 flush privileges;
 ```
 
