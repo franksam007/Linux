@@ -19,6 +19,11 @@ Superset是用Python写的，所以Python环境提前搞好，最好用3.6.x版�
 ### 安装必要Python包
 `pip install -r incubator-superset/requirements.txt`
 
+`pip install -r incubator-superset/requirements-dev.txt`
+如果出现`mysql_config not found`错误，则需要安装libmysqlclient-dev
+
+`(Ubuntu)apt install libmysqlclient-dev`
+
 注意：还需要安装Python访问数据库的包。
 
 ### 安装Nodejs和NVM
@@ -118,9 +123,11 @@ MAPBOX_API_KEY = ''
 
 `(venv) # superset runserver -d -p 8088`
 
-注意上一命令已经废弃，会报错：`[DEPRECATED] As of Flask >=1.0.0, this command is no longer supported, please use `flask run` instead, as documented in our CONTRIBUTING.md`
+注意上一命令已经废弃，会报错：
 
-使用以下命令（开发模式）(急用了Docker的entrypoint.sh）
+`[DEPRECATED] As of Flask >=1.0.0, this command is no longer supported, please use `flask run` instead, as documented in our CONTRIBUTING.md`
+
+使用以下命令（开发模式）(借用了Docker的entrypoint.sh）
 ```
 celery worker --app=superset.sql_lab:celery_app --pool=gevent -Ofair &
 FLASK_ENV=development FLASK_APP=superset:app flask run -p 8088 --with-threads --reload --debugger --host=0.0.0.0
