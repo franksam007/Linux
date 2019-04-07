@@ -20,6 +20,7 @@ Superset是用Python写的，所以Python环境提前搞好，最好用3.6.x版�
 `pip install -r incubator-superset/requirements.txt`
 
 `pip install -r incubator-superset/requirements-dev.txt`
+
 如果出现`mysql_config not found`错误，则需要安装libmysqlclient-dev
 
 `(Ubuntu)apt install libmysqlclient-dev`
