@@ -489,14 +489,92 @@ repolist: 24,327
 `sudo systemctl start apache2`
 
 
-4. 下载和发布Package存储库
+4. 下载和发布Package存储库（Parcels和Package)
 
+========================以下为Package=========================================
+下载要安装的产品的软件包存储库：
+
+* Cloudera Manager 6
+要下载最新ClouderaManager 6.2版本的文件，请在Web服务器主机上运行以下命令。
+```
+sudo mkdir -p /var/www/html/cloudera-repos
+sudo wget --recursive --no-parent --no-host-directories https://archive.cloudera.com/cm6/6.2.0/ubuntu1804/ -P /var/www/html/cloudera-repos
+sudo wget https://archive.cloudera.com/cm6/6.2.0/allkeys.asc -P /var/www/html/cloudera-repos/cm6/6.2.0/
+sudo chmod -R ugo+rX /var/www/html/cloudera-repos/cm6
+```
+
+如果要为不同的ClouderaManager6版本创建存储库，请将6.2.0替换为所需的CDH 6版本。有关更多信息，请参阅Cloudera Manager 6版本并下载信息（https://www.cloudera.com/documentation/enterprise/6/latest/topics/rg_cm_6_version_download.html#cm_6_version_download）。
+
+* CDH 6
+要下载最新CDH 6.2版本的文件，请在Web服务器主机上运行以下命令。
+```
+sudo mkdir -p /var/www/html/cloudera-repos
+sudo wget --recursive --no-parent --no-host-directories https://archive.cloudera.com/cdh6/6.2.0/ubuntu1804/ -P /var/www/html/cloudera-repos
+sudo wget --recursive --no-parent --no-host-directories https://archive.cloudera.com/gplextras6/6.2.0/ubuntu1804/ -P /var/www/html/cloudera-repos
+sudo chmod -R ugo+rX /var/www/html/cloudera-repos/cdh6
+sudo chmod -R ugo+rX /var/www/html/cloudera-repos/gplextras6
+```
+
+如果要为不同的CDH 6版本创建存储库，请将6.2.0替换为所需的CDH 6版本。有关更多信息，请参阅CDH 6下载信息(https://www.cloudera.com/documentation/enterprise/6/latest/topics/rg_cdh_6_download.html#cdh_download_info)。
+
+* Cloudera Manager 5
+要下载ClouderaManager版本的文件，请下载操作系统的存储库tarball。
+```
+sudo mkdir -p /var/www/html/cloudera-repos/cm5
+wget https://archive.cloudera.com/cm5/repo-as-tarball/5.14.4/cm5.14.4-ubuntu16-04.tar.gz
+tar xvfz cm5.14.4-ubuntu16-04.tar.gz -C /var/www/html/cloudera-repos/cm5 --strip-components=1
+sudo chmod -R ugo+rX /var/www/html/cloudera-repos/cm5
+```
+
+如果要为其他Cloudera Manager版本或操作系统创建存储库，请从repo-as-tarball父目录(https://archive.cloudera.com/cm5/repo-as-tarball/)开始，选择要使用的Cloudera Manager版本，然后复制操作系统的.tar.gz链接。
+
+* CDH 5
+要下载CDH版本的文件，请下载操作系统的存储库tarball。
+```
+sudo mkdir -p /var/www/html/cloudera-repos/cdh5
+wget https://archive.cloudera.com/cdh5/repo-as-tarball/5.14.4/cdh5.14.4-ubuntu16-04.tar.gz
+tar xvfz cdh5.14.4-ubuntu16-04.tar.gz -C /var/www/html/cloudera-repos/cdh5 --strip-components=1
+sudo chmod -R ugo+rX /var/www/html/cloudera-repos/cdh5
+```
+
+如果要为不同的CDH版本或操作系统创建存储库，请从repo-as-tarball父目录(https://archive.cloudera.com/cdh5/repo-as-tarball/)开始，选择要使用的CDH版本，然后复制操作系统的.tar.gz链接。
+
+* 用于CDH的Apache Accumulo
+要下载Accumulo发行版的CDH文件，请在Web服务器主机上运行以下命令。
+```
+sudo mkdir -p /var/www/html/cloudera-repos
+sudo wget --recursive --no-parent --no-host-directories https://archive.cloudera.com/accumulo-c5/ubuntu/ -P /var/www/html/cloudera-repos
+sudo chmod -R ugo+rX /var/www/html/cloudera-repos/accumulo-c5
+```
+
+* Cloudera Navigator Key Trustee Server
+转到“密钥受信者服务器”下载页(http://www.cloudera.com/content/www/en-us/downloads/navigator/key-trustee-server.html)。从“选择下载类型”下拉菜单中选择“软件包”，从“选择操作系统”下拉菜单中选择您的操作系统，然后单击“立即下载”。这将在.tar.gz文件中下载密钥受信者服务器包文件。将文件复制到Web服务器，并使用tar xvfz filename.tar.gz命令提取文件。此示例使用密钥受信者服务器5.14.0：
+```
+sudo mkdir -p /var/www/html/cloudera-repos/keytrustee-server
+sudo tar xvfz /path/to/keytrustee-server-5.14.0-parcels.tar.gz -C /var/www/html/cloudera-repos/keytrustee-server --strip-components=1
+sudo chmod -R ugo+rX /var/www/html/cloudera-repos/keytrustee-server
+```
+
+* Cloudera Navigator Key Trustee KMS and HSM KMS
+
+注意：Cloudera Navigator HSM KMS包含在密钥受信者KMS包中。
+
+转到密钥受信者KMS下载页(http://www.cloudera.com/content/www/en-us/downloads/navigator/key-trustee-kms.html)。从“选择下载类型”下拉菜单中选择“软件包”，从“操作系统”下拉菜单中选择您的操作系统，然后单击“立即下载”。这将下载.tar.gz文件中的密钥受信者KMS包文件。将文件复制到Web服务器，并使用tar xvfz filename.tar.gz命令提取文件。此示例使用密钥受信者KMS 5.14.0：
+```
+sudo mkdir -p /var/www/html/cloudera-repos/keytrustee-kms
+sudo tar xvfz /path/to/keytrustee-kms-5.14.0-parcels.tar.gz -C /var/www/html/cloudera-repos/keytrustee-kms --strip-components=1
+sudo chmod -R ugo+rX /var/www/html/cloudera-repos/keytrustee-kms
+```
+
+在浏览器中访问存储库URL http://web_server>/cloudera_repos/，并验证您下载的文件是否存在。如果看不到任何内容，则Web服务器可能已配置为不显示索引。
+
+========================以下为Parcel===========================================
 
 下载manifest.json和要安装的产品的包文件：
 
-* CDH 6
+* CDH 6(Parcels)
 
-apache impala、apache kudu、apache spark 2和cloudera搜索包含在cdh包中。要下载最新CDH 6.2版本的文件，请在Web服务器主机上运行以下命令：
+apache impala、apache kudu、apache spark 2和cloudera搜索包含在cdh包中。要下载最新CDH 6.2版本的文件，在Web服务器主机上运行以下命令：
 
 ```
 sudo mkdir -p /var/www/html/cloudera-repos
@@ -507,6 +585,16 @@ sudo chmod -R ugo+rX /var/www/html/cloudera-repos/gplextras6
 ```
 
 如果要为不同的CDH 6版本创建存储库，请将6.2.0替换为所需的CDH 6版本。有关更多信息，请参阅CDH 6下载信息(https://www.cloudera.com/documentation/enterprise/6/latest/topics/rg_cdh_6_download.html#cdh_download_info)。
+
+
+* CM 6
+在Web服务器主机上运行以下命令：
+```
+sudo mkdir -p /var/www/html/cloudera-repos
+sudo wget --recursive --no-parent --no-host-directories https://archive.cloudera.com/cm6/6.2.0/ubuntu1804/apt/ -P /var/www/html/cloudera-repos
+sudo chmod -R ugo+rX /var/www/html/cloudera-repos/cm6
+```
+如果要为不同的CM 6版本创建存储库，请将6.2.0替换为所需的CDH 6版本。有关更多信息，请参阅CM 6下载信息(https://www.cloudera.com/documentation/enterprise/6/release-notes/topics/rg_cm_6_version_download.html#cm_6_version_download)。
 
 * CDH 5
 
@@ -579,3 +667,92 @@ sudo chmod -R ugo+rX /var/www/html/cloudera-repos/sqoop-connectors
 如果要为不同的sqoop connector版本创建存储库，请将最新版本替换为所需的sqoop connector版本。您可以在Parcels父目录中看到版本列表。
 
 在浏览器中访问存储库URL http://<Web_server>/cloudera-repos/，并验证您下载的文件是否存在。如果看不到任何内容，则Web服务器可能已配置为不显示索引。
+
+5. 配置主机以使用内部存储库
+建立存储库后，修改客户机配置以使用它：
+
+* rhel兼容
+
+在群集主机上创建/etc/yum.repos.d/cloudera-repo.repo文件，内容如下，<web_server>是Web服务器的主机名：
+```
+[cloudera-repo]
+name=cloudera-repo
+baseurl=http://<web_server>/cm/5
+enabled=1
+gpgcheck=0 
+```
+
+* SLES
+使用zypper实用程序通过发出以下命令来更新客户机系统存储库信息：
+zypper addrepo http://<web_server>/cm <alias>
+
+* ubuntu
+在所有集群主机上创建/etc/apt/sources.list.d/cloudera-repo.list文件，其中<web_server>是web服务器的主机名：
+`deb [arch=amd64] http://localh/cm6/6.2.0/ubuntu1804/apt <codename> <components>`
+
+可以在存储库的./conf/distributions文件中找到<codename>和<components>变量。
+
+例如：`deb [arch=amd64] http://localh/cm6/6.2.0/ubuntu1804/apt bionic-cm6.2.0 contrib`
+
+创建.list文件后，运行以下命令：
+ 
+`sudo apt-get update`
+
+6. 配置Cloudera Manager以使用内部远程包存储库
+
+  1. 使用以下方法之一打开“包裹设置”页面：
+
+    * Navigation bar
+
+      * 单击顶部导航栏中的Parcels图标，或单击Hosts，然后单击Parcels选项卡。
+
+      * 单击Menu按钮。
+
+   * Menu
+
+     * 选择Administration > Settings.。
+
+     * 选择 Category > Parcels。
+
+  2. 在“Remote Parcel Repository URLs”列表中，单击“添加”符号以打开另一行。
+
+  3. 输入包的路径。例如：http://<web_server>/cloudera packages/cdh6/6.2.0/
+
+  4. 输入更改原因，然后单击“Save Changes”以提交更改。
+
+## 2. 安装CM和CDH 6.2
+
+### 2.1. 配置Repo
+Cloudera Manager是使用包管理工具安装的，例如用于RHEL兼容系统的yum、用于SLES的zypper和用于Ubuntu的apt-get。这些工具依赖于对存储库的访问来安装软件。Cloudera为CDH和Cloudera Manager安装文件维护可访问互联网的存储库。还可以为没有Internet访问权限的主机创建自己的内部存储库。
+
+要使用Cloudera存储库，请执行以下操作：
+RHEL兼容
+将操作系统版本的cloudera-manager.repo文件下载到cloudera manager服务器主机上的/etc/yum.repo.d/目录。
+您可以在Cloudera Manager 6版本的repo文件列中找到URL，并下载要安装的Cloudera Manager版本的信息表。
+例如：
+sudo wget<repo_file_url>-p/etc/yum.repos.d/
+导入存储库签名GPG密钥：
+RHEL 7兼容：
+sudo-rpm——导入https://archive.cloudera.com/cm6/6.2.0/redhat7/yum/rpm-gpg-key-cloudera
+RHEL 6兼容：
+sudo-rpm——导入https://archive.cloudera.com/cm6/6.2.0/redhat6/yum/rpm-gpg-key-cloudera
+继续步骤2：安装Java开发工具包。
+斯莱斯
+通过运行以下命令更新系统包索引：
+sudo zypper刷新
+使用zyper add repo添加repo。
+您可以在Cloudera Manager 6版本的repo文件列中找到URL，并下载要安装的Cloudera Manager版本的信息表。
+例如：
+sudo zypper addrepo-f https://archive.cloudera.com/cm6/6.2.0/sles12/yum/cloudera-manager.repo
+导入存储库签名GPG密钥：
+sudo-rpm——导入https://archive.cloudera.com/cm6/6.2.0/sles12/yum/rpm-gpg-key-cloudera
+继续步骤2：安装Java开发工具包。
+乌邦图
+将操作系统版本的cloudera.list文件下载到cloudera manager服务器主机上的/etc/apt/sources.list.d/目录。
+您可以在Cloudera Manager 6版本的repo文件列中找到URL，并下载要安装的Cloudera Manager版本的信息表。
+导入存储库签名GPG密钥：
+wget https://archive.cloudera.com/cm6/6.2.0/ubuntu1604/apt/archive.key
+sudo apt key添加archive.key
+通过运行以下命令更新系统包索引：
+更新源
+继续步骤2：安装Java开发工具包。
