@@ -522,3 +522,60 @@ sudo chmod -R ugo+rX /var/www/html/cloudera-repos/gplextras5
 
 如果要为不同的CDH版本创建存储库，请将5.14.4替换为所需的CDH版本。有关更多信息，请参阅CDH下载信息(https://www.cloudera.com/documentation/enterprise/release-notes/topics/cdh_vd_cdh_download.html)。
 
+* 用于CDH的Apache Accumulo
+
+要下载用于CDH的AccuMulo版本的文件（本例中为AccuMulo 1.7.2），请在Web服务器主机上运行以下命令：
+```
+sudo mkdir -p /var/www/html/cloudera-repos
+sudo wget --recursive --no-parent --no-host-directories https://archive.cloudera.com/accumulo-c5/parcels/1.7.2/ -P /var/www/html/cloudera-repos
+sudo chmod -R ugo+rX /var/www/html/cloudera-repos/accumulo-c5
+```
+
+如果要为Accumulo 1.6.0创建存储库，请将1.7.2替换为1.6.0。
+
+* 用于CDH的由Apache Spark 2驱动的CDS
+
+要下载CDS for CDH发行版的文件（本例中为CDS 2.3.0.Cloudera3），请在Web服务器主机上运行以下命令：
+
+```
+sudo mkdir -p /var/www/html/cloudera-repos
+sudo wget --recursive --no-parent --no-host-directories https://archive.cloudera.com/spark2/parcels/2.3.0.cloudera3/ -P /var/www/html/cloudera-repos
+sudo chmod -R ugo+rX /var/www/html/cloudera-repos/spark2
+```
+
+
+如果要为不同的CDS版本创建存储库，请将2.3.0.cloudera3替换为所需的CD版本。有关更多信息，请参阅由ApacheShark版本信息提供支持的CDS(https://www.cloudera.com/documentation/spark2/latest/topics/spark2_packaging.html#versions)。
+
+* Cloudera Navigator Key Trustee Server
+
+转到“密钥受信者服务器”下载页（http://www.cloudera.com/content/www/en-us/downloads/navigator/key-trustee-server.html）。从“选择下载类型”下拉菜单中选择“包裹”，然后单击“立即下载”。这将在.tar.gz文件中下载密钥受信者服务器包和manifest.json文件。将文件复制到Web服务器，并使用tar xvfz filename.tar.gz命令提取文件。此示例使用密钥受信者服务器5.14.0：
+
+```
+sudo mkdir -p /var/www/html/cloudera-repos/keytrustee-server
+sudo tar xvfz /path/to/keytrustee-server-5.14.0-parcels.tar.gz -C /var/www/html/cloudera-repos/keytrustee-server --strip-components=1
+sudo chmod -R ugo+rX /var/www/html/cloudera-repos/keytrustee-server
+```
+
+* Cloudera Navigator Key Trustee KMS and HSM KMS
+
+*注意*：Cloudera Navigator HSM KMS包含在密钥受信者KMS包中。
+
+转到密钥受信者KMS下载页(http://www.cloudera.com/content/www/en-us/downloads/navigator/key-trustee-kms.html)。从“选择下载类型”下拉菜单中选择“包裹”，然后单击“立即下载”。这将在.tar.gz文件中下载密钥受信者KMS包和manifest.json文件。将文件复制到Web服务器，并使用tar xvfz filename.tar.gz命令提取文件。此示例使用密钥受信者KMS 5.14.0：
+```
+sudo mkdir -p /var/www/html/cloudera-repos/keytrustee-kms
+sudo tar xvfz /path/to/keytrustee-kms-5.14.0-parcels.tar.gz -C /var/www/html/cloudera-repos/keytrustee-kms --strip-components=1
+sudo chmod -R ugo+rX /var/www/html/cloudera-repos/keytrustee-kms
+```
+
+* Sqoop连接器
+
+要下载sqoop连接器版本的包，请在Web服务器主机上运行以下命令。此示例使用最新的可用sqoop连接器：
+```
+sudo mkdir -p /var/www/html/cloudera-repos
+sudo wget --recursive --no-parent --no-host-directories http://archive.cloudera.com/sqoop-connectors/parcels/latest/ -P /var/www/html/cloudera-repos
+sudo chmod -R ugo+rX /var/www/html/cloudera-repos/sqoop-connectors
+```
+
+如果要为不同的sqoop connector版本创建存储库，请将最新版本替换为所需的sqoop connector版本。您可以在Parcels父目录中看到版本列表。
+
+在浏览器中访问存储库URL http://<Web_server>/cloudera-repos/，并验证您下载的文件是否存在。如果看不到任何内容，则Web服务器可能已配置为不显示索引。
