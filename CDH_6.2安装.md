@@ -334,4 +334,191 @@ RHEL6兼容的操作系统包括python 2.6。在安装或升级到Cloudera Enter
 ### 1.9. 端口
 略
 
+### 1.10 自定义安装
+
+#### 建立本地软件库(Repo)
+
+##### 包管理工具
+
+
+包（RPM或DEB文件）有助于通过满足包依赖性来确保安装成功完成。安装特定软件包时，所有其他必需的软件包都会同时安装。例如，hadoop-0.20-hive依赖于hadoop-0.20。
+
+
+包管理工具，如yum（rhel）、zypper（sles）和apt-get（ubuntu）是可以查找和安装所需包的工具。例如，在与RHEL兼容的系统上，可以运行命令yum install hadoop-0.20-hive。yum实用程序通知您Hive软件包需要Hadoop-0.20，并提供安装服务。Zypper和APT GET提供类似的功能。
+
+##### 包存储库
+
+
+包管理工具依赖包存储库来安装软件并解决任何依赖性需求。
+
+###### 存储库配置文件
+
+关于包存储库的信息存储在配置文件中，配置文件的位置根据包管理工具的不同而不同。
+
+* 兼容RHEL（yum）：/etc/yum.repos.d
+
+* SLES（zypper）：/etc/zypp/zypper.conf
+
+* Ubuntu（apt-get）：/etc/apt/apt.conf（使用/etc/apt/sources.list.d/目录中的.list文件指定其他存储库。）
+
+例如，在典型的CentOS系统上，您可能会发现：
+```
+ls -l /etc/yum.repos.d/
+total 36
+-rw-r--r--. 1 root root 1664 Dec  9  2015 CentOS-Base.repo
+-rw-r--r--. 1 root root 1309 Dec  9  2015 CentOS-CR.repo
+-rw-r--r--. 1 root root  649 Dec  9  2015 CentOS-Debuginfo.repo
+-rw-r--r--. 1 root root  290 Dec  9  2015 CentOS-fasttrack.repo
+-rw-r--r--. 1 root root  630 Dec  9  2015 CentOS-Media.repo
+-rw-r--r--. 1 root root 1331 Dec  9  2015 CentOS-Sources.repo
+-rw-r--r--. 1 root root 1952 Dec  9  2015 CentOS-Vault.repo
+-rw-r--r--. 1 root root  951 Jun 24  2017 epel.repo
+-rw-r--r--. 1 root root 1050 Jun 24  2017 epel-testing.repo
+```
+
+.repo文件包含指向一个或多个存储库的指针。Zypper和APT GET的配置文件中有类似的指针。在下面的centos-base.repo摘录中，定义了两个存储库：一个命名为base，另一个命名为updates。mirrorlist参数指向一个网站，该网站具有可下载此存储库的位置列表。
+
+```
+[base]
+name=CentOS-$releasever - Base
+mirrorlist=http://mirrorlist.centos.org/?release=$releasever&arch=$basearch&repo=os&infra=$infra
+#baseurl=http://mirror.centos.org/centos/$releasever/os/$basearch/
+gpgcheck=1
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-7
+
+#released updates
+[updates]
+name=CentOS-$releasever - Updates
+mirrorlist=http://mirrorlist.centos.org/?release=$releasever&arch=$basearch&repo=updates&infra=$infra
+#baseurl=http://mirror.centos.org/centos/$releasever/updates/$basearch/
+gpgcheck=1
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-7
+```
+
+###### 列出存储库
+
+可以通过运行以下命令之一列出已启用的存储库：
+
+* RHEL兼容：yum repolist
+
+* SLES:zypper repos
+
+* Ubuntu:apt-get不包含显示源的命令，但可以通过查看/etc/apt/sources.list和/etc/apt/sources.list.d/中包含的任何文件来确定源。
+
+
+
+以下是CentOS 7系统上yum repolist的输出示例：
+```
+repo id               repo name                                           status
+base/7/x86_64         CentOS-7 - Base                                      9,591
+epel/x86_64           Extra Packages for Enterprise Linux 7 - x86_64      12,382
+extras/7/x86_64       CentOS-7 - Extras                                      392
+updates/7/x86_64      CentOS-7 - Updates                                   1,962
+repolist: 24,327
+```
+##### 配置本地Parcel库
+###### 设置Web服务器
+要承载内部存储库，必须在Cloudera Manager主机可访问的内部主机上安装或使用现有的Web服务器，然后将存储库文件下载到Web服务器主机。本页上的示例使用ApacheHTTP服务器作为Web服务器。如果组织中已有Web服务器，则可以跳到下载和发布包裹存储库。
+
+1. 安装Apache HTTP服务器：
+  `sudo apt-get install httpd`
+
+2. 警告：跳过此步骤可能会导致在尝试从本地存储库下载包时出现错误消息哈希验证失败，特别是在Cloudera Manager 6及更高版本中。
+
+编辑Apache HTTP服务器配置文件（/etc/httpd/conf/httpd.conf，默认情况下）以添加或编辑<IfModule mime_module>部分中的以下行：
+
+`AddType application/x-gzip .gz .tgz .parcel`
+
+
+如果<IfModule mime_module>部分不存在，可以按如下方式将其全部添加：
+
+注意：此示例配置是在RHEL7上安装ApacheHTTP服务器之后根据提供的默认配置进行修改的。
+
+```
+<IfModule mime_module>
+    #
+    # TypesConfig points to the file containing the list of mappings from
+    # filename extension to MIME-type.
+    #
+    TypesConfig /etc/mime.types
+
+    #
+    # AddType allows you to add to or override the MIME configuration
+    # file specified in TypesConfig for specific file types.
+    #
+    #AddType application/x-gzip .tgz
+    #
+    # AddEncoding allows you to have certain browsers uncompress
+    # information on the fly. Note: Not all browsers support this.
+    #
+    #AddEncoding x-compress .Z
+    #AddEncoding x-gzip .gz .tgz
+    #
+    # If the AddEncoding directives above are commented-out, then you
+    # probably should define those extensions to indicate media types:
+    #
+    AddType application/x-compress .Z
+    AddType application/x-gzip .gz .tgz .parcel
+
+    #
+    # AddHandler allows you to map certain file extensions to "handlers":
+    # actions unrelated to filetype. These can be either built into the server
+    # or added with the Action directive (see below)
+    #
+    # To use CGI scripts outside of ScriptAliased directories:
+    # (You will also need to add "ExecCGI" to the "Options" directive.)
+    #
+    #AddHandler cgi-script .cgi
+
+    # For type maps (negotiated resources):
+    #AddHandler type-map var
+
+    #
+    # Filters allow you to process content before it is sent to the client.
+    #
+    # To parse .shtml files for server-side includes (SSI):
+    # (You will also need to add "Includes" to the "Options" directive.)
+    #
+    AddType text/html .shtml
+    AddOutputFilter INCLUDES .shtml
+</IfModule>
+```
+
+3. 启动Apache HTTP服务器：
+
+`sudo systemctl start apache2`
+
+
+4. 下载和发布Package存储库
+
+
+下载manifest.json和要安装的产品的包文件：
+
+* CDH 6
+
+apache impala、apache kudu、apache spark 2和cloudera搜索包含在cdh包中。要下载最新CDH 6.2版本的文件，请在Web服务器主机上运行以下命令：
+
+```
+sudo mkdir -p /var/www/html/cloudera-repos
+sudo wget --recursive --no-parent --no-host-directories https://archive.cloudera.com/cdh6/6.2.0/parcels/ -P /var/www/html/cloudera-repos
+sudo wget --recursive --no-parent --no-host-directories https://archive.cloudera.com/gplextras6/6.2.0/parcels/ -P /var/www/html/cloudera-repos
+sudo chmod -R ugo+rX /var/www/html/cloudera-repos/cdh6
+sudo chmod -R ugo+rX /var/www/html/cloudera-repos/gplextras6
+```
+
+如果要为不同的CDH 6版本创建存储库，请将6.2.0替换为所需的CDH 6版本。有关更多信息，请参阅CDH 6下载信息(https://www.cloudera.com/documentation/enterprise/6/latest/topics/rg_cdh_6_download.html#cdh_download_info)。
+
+* CDH 5
+
+Impala, Kudu, Spark 1, 和Search都包含在CDH包裹中。要下载CDH版本的文件（本例中为CDH 5.14.4），请在Web服务器主机上运行以下命令：
+
+```
+sudo mkdir -p /var/www/html/cloudera-repos
+sudo wget --recursive --no-parent --no-host-directories https://archive.cloudera.com/cdh5/parcels/5.14.4/ -P /var/www/html/cloudera-repos
+sudo wget --recursive --no-parent --no-host-directories https://archive.cloudera.com/gplextras5/parcels/5.14.4/ -P /var/www/html/cloudera-repos
+sudo chmod -R ugo+rX /var/www/html/cloudera-repos/cdh5
+sudo chmod -R ugo+rX /var/www/html/cloudera-repos/gplextras5
+```
+
+如果要为不同的CDH版本创建存储库，请将5.14.4替换为所需的CDH版本。有关更多信息，请参阅CDH下载信息(https://www.cloudera.com/documentation/enterprise/release-notes/topics/cdh_vd_cdh_download.html)。
 
