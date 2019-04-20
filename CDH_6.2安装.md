@@ -501,6 +501,7 @@ sudo mkdir -p /var/www/html/cloudera-repos
 sudo wget --recursive --no-parent --no-host-directories https://archive.cloudera.com/cm6/6.2.0/ubuntu1804/ -P /var/www/html/cloudera-repos
 sudo wget https://archive.cloudera.com/cm6/6.2.0/allkeys.asc -P /var/www/html/cloudera-repos/cm6/6.2.0/
 sudo chmod -R ugo+rX /var/www/html/cloudera-repos/cm6
+sudo apt-key add /var/www/html/cloudera-repos/cm6/6.2.0/ubuntu1804/apt/archive.key
 ```
 
 如果要为不同的ClouderaManager6版本创建存储库，请将6.2.0替换为所需的CDH 6版本。有关更多信息，请参阅Cloudera Manager 6版本并下载信息（https://www.cloudera.com/documentation/enterprise/6/latest/topics/rg_cm_6_version_download.html#cm_6_version_download）。
@@ -513,6 +514,7 @@ sudo wget --recursive --no-parent --no-host-directories https://archive.cloudera
 sudo wget --recursive --no-parent --no-host-directories https://archive.cloudera.com/gplextras6/6.2.0/ubuntu1804/ -P /var/www/html/cloudera-repos
 sudo chmod -R ugo+rX /var/www/html/cloudera-repos/cdh6
 sudo chmod -R ugo+rX /var/www/html/cloudera-repos/gplextras6
+sudo apt-key add /var/www/html/cloudera-repos/cdh6/6.2.0/ubuntu1804/apt/archive.key
 ```
 
 如果要为不同的CDH 6版本创建存储库，请将6.2.0替换为所需的CDH 6版本。有关更多信息，请参阅CDH 6下载信息(https://www.cloudera.com/documentation/enterprise/6/latest/topics/rg_cdh_6_download.html#cdh_download_info)。
