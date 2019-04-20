@@ -882,33 +882,495 @@ OracleJDK安装程序既可以作为基于RPM的系统的基于RPM的安装程�
 
 2. 如果Oracle数据库用于Cloudera Manager服务器的，在Cloudera Manager服务器主机上编辑/etc/default/cloudera-scm-server文件。找到以export CMF_JAVA_OPTS开头的行，并将-Xmx2G选项更改为-Xmx4G。
 
-## 2.4. 
+## 2.4. 安装配置数据库
 Cloudera Manager使用各种数据库和数据存储来存储有关Cloudera Manager配置的信息，以及诸如系统运行状况或任务进度等信息。
-尽管您可以在一个环境中部署不同类型的数据库，但这样做可能会造成意想不到的复杂情况。Cloudera建议为所有Cloudera数据库选择一个受支持的数据库提供程序。
+
+尽管可以在一个环境中部署不同类型的数据库，但这样做可能会造成意想不到的复杂情况。建议为所有Cloudera数据库选择一个受支持的数据库提供程序。
+
 Cloudera建议将数据库安装在与服务不同的主机上。将数据库与服务分离有助于将一个或另一个数据库中的故障或资源争用的潜在影响隔离开来。它还可以简化拥有专用数据库管理员的组织中的管理。
-您可以为Cloudera Manager服务器和其他使用数据库的服务使用自己的PostgreSQL、Mariadb、MySQL或Oracle数据库。有关规划、管理和备份Cloudera Manager数据存储的信息，请参阅针对Cloudera Manager的存储空间规划和备份数据库。
-继续阅读：
-所需数据库
-安装和配置数据库
-所需数据库
+
+可以为Cloudera Manager服务器和其他使用数据库的服务使用自己的PostgreSQL、Mariadb、MySQL或Oracle数据库。有关规划、管理和备份Cloudera Manager数据存储的信息，请参阅针对Cloudera Manager的存储空间规划和备份数据库。
+
+#### 2.4.1. 所需数据库
 以下组件都需要数据库：cloudera manager server、oozie server、sqoop server、activity monitor、reports manager、hive metastore server、hue server、sentry server、cloudera navigator audit server和cloudera navigator metadata server。数据库中包含的数据类型及其相对大小如下：
-Cloudera Manager服务器-包含有关已配置的服务及其角色分配、所有配置历史记录、命令、用户和正在运行的进程的所有信息。这个相对较小的数据库（<100 MB）是最重要的备份。
+
+* cloudera manager server-包含有关已配置的服务及其角色分配、所有配置历史记录、命令、用户和正在运行的进程的所有信息。这个相对较小的数据库（<100 MB）是最重要的备份。
 重要提示：当您重新启动进程时，每个服务的配置将使用保存在Cloudera Manager数据库中的信息重新部署。如果此信息不可用，则群集无法启动或正常工作。您必须计划和维护Cloudera Manager数据库的定期备份，以便在该数据库丢失时恢复集群。有关详细信息，请参阅备份数据库。
-Oozie服务器-包含Oozie工作流、协调器和捆绑数据。可以长得很大。
-sqoop服务器-包含连接器、驱动程序、链接和作业等实体。相对较小。
-活动监视器-包含有关过去活动的信息。在大的集群中，这个数据库可以变大。只有在部署了MapReduce服务时，才需要配置活动监视器数据库。
-报告管理器-跟踪磁盘利用率和随时间变化的处理活动。中等大小。
-Hive元存储服务器-包含Hive元数据。相对较小。
-色调服务器-包含用户帐户信息、作业提交和配置单元查询。相对较小。
-Sentry服务器-包含授权元数据。相对较小。
-Cloudera Navigator审核服务器-包含审核信息。在大的集群中，这个数据库可以变大。
-Cloudera Navigator元数据服务器-包含授权、策略和审计报告元数据。相对较小。
+
+* oozie server-包含Oozie工作流、协调器和捆绑数据。可以长得很大。
+
+* sqoop server-包含连接器、驱动程序、链接和作业等实体。相对较小。
+
+* activity monitor-包含有关过去活动的信息。在大的集群中，这个数据库可以变大。只有在部署了MapReduce服务时，才需要配置活动监视器数据库。
+
+* reports manager-跟踪磁盘利用率和随时间变化的处理活动。中等大小。
+
+* hive metastore server-包含Hive元数据。相对较小。
+
+* hue server-包含用户帐户信息、作业提交和配置单元查询。相对较小。
+
+* sentry server-包含授权元数据。相对较小。
+
+* cloudera navigator audit server-包含审核信息。在大的集群中，这个数据库可以变大。
+
+* cloudera navigator metadata server-包含授权、策略和审计报告元数据。相对较小。
+
 主机监视器和服务监视器服务使用基于本地磁盘的数据存储。有关更多信息，请参阅数据存储以获取监控数据。
+
 数据库的JDBC连接器必须安装在分配活动监视器和报表管理器角色的主机上。
-安装和配置数据库
-有关为Cloudera Manager、CDH和其他托管服务安装和配置数据库的说明，请参阅有关要使用的数据库类型的说明：
-安装和配置Mariadb
-安装和配置MySQL
-安装和配置PostgreSQL
-安装和配置Oracle数据库
-为sqoop 2配置外部数据库
+
+#### 2.4.2. 安装和配置数据库(Mysql)
+
+##### 2.4.2.1 安装数据库
+* RHEL 	
+
+mysql不再包含在rhel中。您必须从MySQL站点下载存储库并直接安装它。可以使用以下命令安装MySQL。有关更多信息，请访问MySQL网站。
+
+```
+wget http://repo.mysql.com/mysql-community-release-el7-5.noarch.rpm
+
+sudo rpm -ivh mysql-community-release-el7-5.noarch.rpm
+
+sudo yum update
+
+sudo yum install mysql-server
+
+sudo systemctl start mysqld
+```
+
+* SLES 	
+
+`sudo zypper install mysql libmysqlclient_r17`
+
+注意：某些SLES系统在使用前面的zyper安装命令时会遇到错误。有关解决此问题的详细信息，请参阅Novell知识库主题“error running chkconfig.”( http://www.novell.com/support/kb/doc.php?id=7010013 )。
+
+* Ubuntu 	
+
+`sudo apt-get install mysql-server`
+
+##### 2.4.2.2 配置起停数据库
+1. 如果mysql服务器正在运行，停止它。
+
+* RHEL 7兼容
+
+`sudo systemctl stop mysqld`
+
+* RHEL 6兼容
+
+`sudo service mysqld stop`
+
+* SLES, Ubuntu
+
+`sudo service mysql stop`
+
+2. 将旧的innodb日志文件/var/lib/mysql/ib_logfile0和/var/lib/mysql/ib_logfile1移出/var/lib/mysql/到备份位置。
+
+3. 确定选项文件my.cnf的位置（默认为/etc/my.cnf，Ubuntu 18.04上在/etc/mysql/）。
+
+  更新my.cnf，使其符合以下要求：
+  * 要防止死锁，请将隔离级别设置为READ-COMMITTED。
+  * 配置InnoDB引擎。如果表配置了myisam引擎，则ClouderaManager将不会启动。（通常，如果innodb引擎配置错误，表将恢复为myisam。）要检查表使用的引擎，请从mysql shell运行以下命令：
+    `mysql> show table status;`
+  * 大多数发行版中mysql安装的默认设置使用保守的缓冲区大小和内存使用率。Cloudera管理服务角色需要较高的写吞吐量，因为它们可能会在数据库中插入许多记录。cloudera建议您将innodb_flush_method属性设置为O_DIRECT.。
+  * 根据集群的大小设置max_connections属性：
+    * 少于50个主机-可以在同一主机上存储多个数据库（例如，活动监视器和服务监视器）。如果这样做，应该：
+      * 将每个数据库放在自己的存储卷上。
+      * 每个数据库最多允许100个连接，然后添加50个额外连接。例如，对于两个数据库，将最大连接数设置为250。如果在一台主机上存储五个数据库（Cloudera Manager服务器、活动监视器、报表管理器、Cloudera Navigator和Hive元存储的数据库），请将最大连接数设置为550。
+    * 超过50个主机-不要在同一主机上存储多个数据库。为每个数据库/主机对使用单独的主机。主机不需要专门为数据库保留，但每个数据库都应该在单独的主机上。
+
+  * 如果群集有1000多个主机，请将max_allowed_packet属性设置为16M。如果没有此设置，群集可能由于以下异常而无法启动：com.mysql.jdbc.packettoobigexception。
+
+  * 对于Cloudera Manager安装，不需要二进制日志记录。二进制日志记录提供了诸如MySQL复制或数据库恢复后的时间点增量恢复等好处。下面是这种配置的示例。有关详细信息，请参阅二进制日志。
+
+  以下是带有Cloudera推荐设置的选项文件：
+  ```
+  [mysqld]
+datadir=/var/lib/mysql
+socket=/var/lib/mysql/mysql.sock
+transaction-isolation = READ-COMMITTED
+# Disabling symbolic-links is recommended to prevent assorted security risks;
+# to do so, uncomment this line:
+symbolic-links = 0
+
+key_buffer_size = 32M
+max_allowed_packet = 32M
+thread_stack = 256K
+thread_cache_size = 64
+query_cache_limit = 8M
+query_cache_size = 64M
+query_cache_type = 1
+
+max_connections = 550
+#expire_logs_days = 10
+#max_binlog_size = 100M
+
+#log_bin should be on a disk with enough free space.
+#Replace '/var/lib/mysql/mysql_binary_log' with an appropriate path for your
+#system and chown the specified folder to the mysql user.
+log_bin=/var/lib/mysql/mysql_binary_log
+
+#In later versions of MySQL, if you enable the binary log and do not set
+#a server_id, MySQL will not start. The server_id must be unique within
+#the replicating group.
+server_id=1
+
+binlog_format = mixed
+
+read_buffer_size = 2M
+read_rnd_buffer_size = 16M
+sort_buffer_size = 8M
+join_buffer_size = 8M
+
+# InnoDB settings
+innodb_file_per_table = 1
+innodb_flush_log_at_trx_commit  = 2
+innodb_log_buffer_size = 64M
+innodb_buffer_pool_size = 4G
+innodb_thread_concurrency = 8
+innodb_flush_method = O_DIRECT
+innodb_log_file_size = 512M
+
+[mysqld_safe]
+log-error=/var/log/mysqld.log
+pid-file=/var/run/mysqld/mysqld.pid
+
+sql_mode=STRICT_ALL_TABLES
+```
+
+5. 如果Apparmor运行在安装了MySQL的主机上，则可能需要配置Apparmor以允许MySQL写入二进制文件。
+
+6. 确保mysql服务器在启动时启动：
+
+  * RHEL 7兼容
+
+    `sudo systemctl enable mysqld`
+    
+  * RHEL 6兼容
+
+    `sudo chkconfig mysqld on`
+  
+  * SLES
+  
+    `sudo chkconfig --add mysql`
+  
+  * Ubuntu
+    
+    `sudo chkconfig mysql on`
+    
+    注意：chkconfig可能在最近的Ubuntu版本上不可用。您可能需要使用upstart配置mysql在系统启动时自动启动。有关更多信息，请参阅Ubuntu文档或新贵食谱。
+
+7. 启动mysql服务器：
+
+  * RHEL 7兼容
+
+    `sudo systemctl start mysqld`
+
+  * 兼容RHEL 6
+
+    `sudo service mysqld start`
+
+  * SLES, Ubuntu
+
+    `sudo service mysql start`
+    
+8. 运行/usr/bin/mysql_secure_installation来设置mysql根密码和其他与安全相关的设置。在新安装中，根密码为空。当系统提示您输入根密码时，请按Enter键。对于其余提示，请以粗体输入下面列出的响应：
+
+  `sudo /usr/bin/mysql_secure_installation`
+  ```
+    [...]
+    Enter current password for root (enter for none):
+    OK, successfully used password, moving on...
+    [...]
+    Set root password? [Y/n] Y
+    New password:
+    Re-enter new password:
+    Remove anonymous users? [Y/n] Y
+    [...]
+    Disallow root login remotely? [Y/n] N
+    [...]
+    Remove test database and access to it [Y/n] Y
+    [...]
+    Reload privilege tables now? [Y/n] Y
+    All done!
+  ```
+
+9. 安装mysql jdbc驱动程序
+  在Cloudera Manager服务器主机上安装JDBC驱动程序，以及运行需要数据库访问的服务的任何其他主机。有关使用数据库的Cloudera软件的更多信息，请参阅必需的数据库。
+
+  注意：如果已经在需要的主机上安装了JDBC驱动程序，那么可以跳过这一节。但是，MySQL5.6需要5.1驱动程序版本5.1.26或更高版本。
+
+  建议整合有限数量主机上需要数据库的所有角色，并在这些主机上安装驱动程序。建议在同一主机上定位所有此类角色，但不需要。确保在运行访问数据库角色的每个主机上安装JDBC驱动程序。
+
+  注意：Cloudera建议仅使用JDBC驱动程序的5.1版本。
+
+  * RHEL
+    
+    重要提示：在安装JDK之前，使用yum install命令安装mysql驱动程序包安装openjdk，然后使用linux alternations命令将系统jdk设置为openjdk。如果打算使用OracleJDK，请确保在使用yum install安装mysql驱动程序之前安装了它。
+    
+  或者，使用以下步骤手动安装驱动程序。
+  
+    1. 从http://www.mysql.com/downloads/connector/j/5.1.html（格式为.tar.gz）下载mysql jdbc驱动程序。截至撰写之时，可以使用wget下载5.1.46版，如下所示：
+    
+      `wget https://dev.mysql.com/get/downloads/connector-j/mysql-connector-java-5.1.46.tar.gz`
+    
+    2. 从下载的文件中提取JDBC驱动程序JAR文件。例如：
+    
+      `tar zxvf mysql-connector-java-5.1.46.tar.gz`
+    
+    3. 复制JDBC驱动程序，重命名为/usr/share/java/。如果目标目录尚不存在，请创建它。例如：
+    
+      ```
+      sudo mkdir -p /usr/share/java/
+      cd mysql-connector-java-5.1.46
+      sudo cp mysql-connector-java-5.1.46-bin.jar /usr/share/java/mysql-connector-java.jar
+      ```
+
+  * SLES
+  
+    `sudo zypper install mysql-connector-java`
+
+  * Ubuntu或Debian
+  
+    `sudo apt-get install libmysql-java`
+
+##### 2.4.2.3. 为Cloudera软件创建数据库
+  为需要数据库的组件创建数据库和服务帐户：
+
+  * Cloudera Manager Server
+  * Cloudera Management Service roles:
+    * Activity Monitor (if using the MapReduce service in a CDH 5 cluster)
+    * Reports Manager
+  * Hue
+  * Each Hive metastore
+  * Sentry Server
+  * Cloudera Navigator Audit Server
+  * Cloudera Navigator Metadata Server
+  * Oozie
+
+  1. 以根用户或其他具有创建数据库和授予权限的用户身份登录：
+  
+    ```
+    mysql -u root -p
+    Enter password:
+    ```
+    
+  2. 使用以下命令为集群中部署的每个服务创建数据库。您可以为<database>、<user>和<password>参数使用所需的任何值。
+  
+  将所有数据库配置为使用utf8字符集。
+  
+  当运行下面描述的create database语句时，包括每个数据库的字符集。
+  
+  ```
+  CREATE DATABASE <database> DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_general_ci;
+
+  Query OK, 1 row affected (0.00 sec)
+
+  GRANT ALL ON <database>.* TO '<user>'@'%' IDENTIFIED BY '<password>';
+
+  Query OK, 0 rows affected (0.00 sec)
+  ```
+  
+  具体语句可使用：
+  
+  ```
+  CREATE DATABASE scm DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_general_ci;
+  GRANT ALL ON scm.* TO 'scm'@'%' IDENTIFIED BY 'scm';
+
+  CREATE DATABASE amon DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_general_ci;
+  GRANT ALL ON amon.* TO 'amon'@'%' IDENTIFIED BY 'amon';
+
+  CREATE DATABASE rman DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_general_ci;
+  GRANT ALL ON rman.* TO 'rman'@'%' IDENTIFIED BY 'rman';
+
+  CREATE DATABASE hue DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_general_ci;
+  GRANT ALL ON hue.* TO 'hue'@'%' IDENTIFIED BY 'hue';
+
+  CREATE DATABASE metastore DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_general_ci;
+  GRANT ALL ON metastore.* TO 'hive'@'%' IDENTIFIED BY 'hive';
+
+  CREATE DATABASE sentry DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_general_ci;
+  GRANT ALL ON sentry.* TO 'sentry'@'%' IDENTIFIED BY 'sentry';
+
+  CREATE DATABASE nav DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_general_ci;
+  GRANT ALL ON nav.* TO 'nav'@'%' IDENTIFIED BY 'nav';
+
+  CREATE DATABASE navms DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_general_ci;
+  GRANT ALL ON navms.* TO 'navms'@'%' IDENTIFIED BY 'navms';
+
+  CREATE DATABASE oozie DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_general_ci;
+  GRANT ALL ON oozie.* TO 'oozie'@'%' IDENTIFIED BY 'oozie';
+
+  FLUSH PRIVILEGES;
+  ```
+
+3. 确认已创建所有数据库：
+
+  `SHOW DATABASES;`
+
+通过运行以下命令来确认给定用户的特权授予：
+
+  `SHOW GRANTS FOR '<user>'@'%';`
+
+4. 记录为数据库名称、用户名和密码输入的值。Cloudera Manager安装向导需要这些信息才能正确连接到这些数据库。 
+
+#### 2.4.3. 安装和配置数据库(Mariadb)
+
+#### 2.4.4. 安装和配置数据库(PostgreSQL)
+
+#### 2.4.5. 安装和配置数据库(Oracle)
+
+#### 为sqoop 2配置外部数据库
+
+### 2.5. 配置CM数据库
+
+Cloudera Manager Server包含一个脚本，可以为自己创建和配置数据库。脚本可以：
+
+* 创建Cloudera Manager Server数据库配置文件。
+
+* （mariadb、mysql和postgresql）为cloudera manager服务器创建和配置一个要使用的数据库。
+
+* （mariadb、mysql和postgresql）为ClouderaManager服务器创建和配置用户帐户。 
+
+#### 2.5.1. scm_prepare_database.sh语法
+
+  scm_prepare_database.sh语法如下：
+  
+  `sudo /opt/cloudera/cm/schema/scm_prepare_database.sh [options] <databaseType> <databaseName> <databaseUser> <password>`
+
+  *注意* ：运行没有选项的scm_prepare_database.sh，可看到语法。
+  
+  在创建新数据库时，必须用参数-u和-p指定具有权限创建数据库的用户。已经在上一个步骤创建了数据库，则不用指定。
+  
+  * <databaseType>
+    数据库类型的支持：
+    * MariaDB：mysql
+    * MySQL：mysql
+    * Oracle：oracle
+    * PostgreSQL：postgresql
+  
+  * <databaseName>
+    要使用的Cloudera Manager服务器数据库的名称。对于mysql、mariadb和postgresql数据库，如果使用具有创建数据库和授予权限权限的用户的凭据指定-u和-p选项，则脚本可以创建指定的数据库。在Cloudera Manager配置设置中提供的默认数据库名称是scm，但可以使用其他名称。
+  * <databaseUser>
+    要创建或使用的Cloudera Manager服务器数据库的用户名。Cloudera Manager配置设置中提供的默认用户名是scm，但可以使用其他名称。
+
+  * <password>
+   创建<databaseUser>或使用的密码。如果不希望密码在屏幕上可见或存储在命令历史记录中，请不要指定密码，并提示以下方式输入密码：
+
+   `Enter SCM password:`
+   
+   其他选项
+   
+   * -?|--help：显示帮助
+   
+   * --config-path：Cloudera Manager Server配置文件路径。默认为/etc/cloudera-scm-server
+   
+   * -f|--force：如果指定，错误发生时不停。
+   
+   * -h|--host：安装主机数据库的主机的IP地址或主机名。默认是使用localhost。
+   
+   * -p|--password：数据库管理员密码。与-u联合使用。默认是没有密码的。不要在p与秘密之间放置空格（例如，-phunter2）。如果不想在屏幕上可见的密码存储在命令或选项的历史，使用-p和没有指定密码，系统将提示：
+   
+     `Enter database password:`
+     
+     如果已经创建数据库，不使用此选项。
+     
+   * -P|--port：数据库端口号。MariaDB、MySQL的默认端口是3306，PostgreSQL的默认端口是5432，OracleL的默认端口是1521。该选项只用于远程连接。
+   
+   * --scm-host：安装Cloudera Manager Server的主机名。Cloudera Manager Server和数据库安装在同一主机上，不是用此选项和-h选项。
+   
+   * --scm-password-script：该运行脚本的输出作为scm用户的数据库密码。
+   
+   * -u|--user 	数据库的管理员用户，与-p一起使用。不要在-u和用户名之间放置空格（例如，-uroot)。如指定本选项，脚本将为Cloudera Manager Server建立用户和数据库。如已经建立数据库，不要使用本选项。
+   
+#### 2.5.2. 准备Cloudera Manager数据库
+  1. 在Cloudera Manager Server主机运行脚本，使用在第四步：安装和配置数据库中的数据库名称，用户名和密码。
+  
+  `sudo /opt/cloudera/cm/schema/scm_prepare_database.sh <databaseType> <databaseName> <databaseUser>`
+
+  如系统提示，输入密码。
+  
+  2. 如果存在，删除嵌入的Postgresql属性文件：
+  
+  `sudo rm /etc/cloudera-scm-server/db.mgmt.properties`
+
+  下面的例子演示不同场景
+  
+##### 例1：MySQL或MariaDB与Cloudera Manager Server在同一台服务器上
+
+  这个例子假定已经创建Cloudera Management Server的数据库用户，数据库、用户名、密码均为scm。
+  
+  `sudo /opt/cloudera/cm/schema/scm_prepare_database.sh mysql scm scm`
+  
+  ```
+  Enter SCM password:
+  JAVA_HOME=/usr/java/jdk1.8.0_141-cloudera
+  Verifying that we can write to /etc/cloudera-scm-server
+  Creating SCM configuration file in /etc/cloudera-scm-server
+  Executing:  /usr/java/jdk1.8.0_141-cloudera/bin/java -cp /usr/share/java/mysql-connector-java.jar:/usr/share/java/oracle-connector-java.jar:/usr/share/java/postgresql-connector-java.jar:/opt/cloudera/cm/schema/../lib/*  com.cloudera.enterprise.dbutil.DbCommandExecutor /etc/cloudera-scm-server/db.properties com.cloudera.cmf.db.
+  [main] DbCommandExecutor              INFO  Successfully connected to database.
+  All done, your SCM database is configured correctly!
+  ```
+##### Example 2: Running the script when MySQL or MariaDB is installed on another host
+
+  此示例演示如何在cloudera manager server主机（cm01.example.com）上运行脚本，并连接到远程mysql或mariadb主机（db01.example.com）。:
+
+  `sudo /opt/cloudera/cm/schema/scm_prepare_database.sh mysql -h db01.example.com --scm-host cm01.example.com scm scm`
+
+  ```
+  Enter database password:
+  JAVA_HOME=/usr/java/jdk1.8.0_141-cloudera
+  Verifying that we can write to /etc/cloudera-scm-server
+  Creating SCM configuration file in /etc/cloudera-scm-server
+  Executing:  /usr/java/jdk1.8.0_141-cloudera/bin/java -cp /usr/share/java/mysql-connector-java.jar:/usr/share/java/oracle-connector-java.jar:/usr/share/java/postgresql-connector-java.jar:/opt/cloudera/cm/schema/../lib/* com.cloudera.enterprise.dbutil.DbCommandExecutor /etc/cloudera-scm-server/db.properties com.cloudera.cmf.db.
+  [                          main] DbCommandExecutor              INFO  Successfully connected to database.
+  All done, your SCM database is configured correctly!
+  ```
+##### Example 3: Running the script to configure Oracle
+
+  `sudo /opt/cloudera/cm/schema/scm_prepare_database.sh -h cm-oracle.example.com oracle orcl sample_user sample_pass`
+
+  ```
+  JAVA_HOME=/usr/java/jdk1.8.0_141-cloudera
+  Verifying that we can write to /etc/cloudera-scm-server
+  Creating SCM configuration file in /etc/cloudera-scm-server
+  Executing:  /usr/java/jdk1.8.0_141-cloudera/bin/java -cp /usr/share/java/mysql-connector-java.jar:/usr/share/java/oracle-connector-java.jar:/usr/share/java/postgresql-connector-java.jar:/opt/cloudera/cm/schema/../lib/*cloudera.enterprise.dbutil.DbCommandExecutor /etc/cloudera-scm-server/db.properties com.cloudera.cmf.db.
+  [ main] DbCommandExecutor INFO Successfully connected to database.
+  All done, your SCM database is configured correctly!
+  ```
+
+### 2.6. 安装CDH
+
+  设置Cloudera Manager Server后，启动Cloudera Manager server，并登录到Cloudera Manager管理控制台：
+
+  1. 启动Cloudera Manager服务器：
+  
+  * 兼容RHEL 7、Ubuntu、SLES：
+    
+    `sudo systemctl start cloudera-scm-server`
+  
+  * RHEL 6兼容：
+  
+    `sudo service cloudera-scm-server start`
+    
+    等待几分钟，让Cloudera Manager服务器启动。要观察启动过程，请在Cloudera Manager服务器主机上运行以下程序：
+    
+    `sudo tail -f /var/log/cloudera-scm-server/cloudera-scm-server.log`
+    
+    当您看到此日志条目时，Cloudera Manager管理控制台已就绪：
+    
+    `INFO WebServerImpl:com.cloudera.server.cmf.WebServerImpl: Started Jetty server.`
+
+
+  2. 在Web浏览器中，转到http://<server_host>：7180，其中<server_host>是运行Cloudera Manager server的主机的fqdn或IP地址。
+    *注意*：如果启用了自动TLS，则会重定向到https://<server_host>：7183，并显示安全警告。您可能需要指示您信任该证书，或者单击以继续到ClouderaManager服务器主机。
+  
+  3. 登录Cloudera Manager管理控制台。默认凭据为：
+    ```
+    Username: admin
+    Password: admin
+    ```
+
+    *注意* ：Cloudera Manager不支持更改已安装帐户的管理员用户名。运行安装向导后，可以使用Cloudera Manager更改密码。虽然不能更改管理员用户名，但可以添加新用户，为新用户分配管理权限，然后删除默认管理员帐户。
+
+    登录后，安装向导将启动。以下部分将指导您完成安装向导的每个步骤
+
