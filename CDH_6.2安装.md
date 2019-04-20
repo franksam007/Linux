@@ -728,33 +728,138 @@ zypper addrepo http://<web_server>/cm <alias>
 Cloudera Manager是使用包管理工具安装的，例如用于RHEL兼容系统的yum、用于SLES的zypper和用于Ubuntu的apt-get。这些工具依赖于对存储库的访问来安装软件。Cloudera为CDH和Cloudera Manager安装文件维护可访问互联网的存储库。还可以为没有Internet访问权限的主机创建自己的内部存储库。
 
 要使用Cloudera存储库，请执行以下操作：
-RHEL兼容
-将操作系统版本的cloudera-manager.repo文件下载到cloudera manager服务器主机上的/etc/yum.repo.d/目录。
-您可以在Cloudera Manager 6版本的repo文件列中找到URL，并下载要安装的Cloudera Manager版本的信息表。
-例如：
-sudo wget<repo_file_url>-p/etc/yum.repos.d/
-导入存储库签名GPG密钥：
-RHEL 7兼容：
-sudo-rpm——导入https://archive.cloudera.com/cm6/6.2.0/redhat7/yum/rpm-gpg-key-cloudera
-RHEL 6兼容：
-sudo-rpm——导入https://archive.cloudera.com/cm6/6.2.0/redhat6/yum/rpm-gpg-key-cloudera
-继续步骤2：安装Java开发工具包。
-斯莱斯
-通过运行以下命令更新系统包索引：
-sudo zypper刷新
-使用zyper add repo添加repo。
-您可以在Cloudera Manager 6版本的repo文件列中找到URL，并下载要安装的Cloudera Manager版本的信息表。
-例如：
-sudo zypper addrepo-f https://archive.cloudera.com/cm6/6.2.0/sles12/yum/cloudera-manager.repo
-导入存储库签名GPG密钥：
-sudo-rpm——导入https://archive.cloudera.com/cm6/6.2.0/sles12/yum/rpm-gpg-key-cloudera
-继续步骤2：安装Java开发工具包。
-乌邦图
-将操作系统版本的cloudera.list文件下载到cloudera manager服务器主机上的/etc/apt/sources.list.d/目录。
-您可以在Cloudera Manager 6版本的repo文件列中找到URL，并下载要安装的Cloudera Manager版本的信息表。
-导入存储库签名GPG密钥：
-wget https://archive.cloudera.com/cm6/6.2.0/ubuntu1604/apt/archive.key
-sudo apt key添加archive.key
-通过运行以下命令更新系统包索引：
-更新源
-继续步骤2：安装Java开发工具包。
+* RHEL兼容
+
+1. 将操作系统版本的cloudera-manager.repo文件下载到cloudera manager服务器主机上的/etc/yum.repo.d/目录。
+
+  可以在Cloudera Manager 6版本的repo文件列中找到URL，并下载要安装的Cloudera Manager版本的信息表。
+
+  例如：
+
+`sudo wget<repo_file_url>-p/etc/yum.repos.d/`
+
+2. 导入存储库签名GPG密钥：
+  * RHEL 7兼容：
+  
+    `sudo rpm --import https://archive.cloudera.com/cm6/6.2.0/redhat7/yum/RPM-GPG-KEY-cloudera`
+
+  * RHEL 6兼容：
+
+    `sudo rpm --import https://archive.cloudera.com/cm6/6.2.0/redhat6/yum/RPM-GPG-KEY-cloudera`
+
+3. 继续步骤2：安装Java开发工具包。
+
+* SLES
+
+1. 通过运行以下命令更新系统包索引：
+
+  `sudo zypper refresh`
+  
+2. 使用zyper add repo添加repo。
+
+  可以在Cloudera Manager 6版本的repo文件列中找到URL，并下载要安装的Cloudera Manager版本的信息表。
+
+  例如：
+
+  `sudo zypper addrepo -f https://archive.cloudera.com/cm6/6.2.0/sles12/yum/cloudera-manager.repo`
+
+3. 导入存储库签名GPG密钥：
+
+  `sudo rpm --import https://archive.cloudera.com/cm6/6.2.0/sles12/yum/RPM-GPG-KEY-cloudera`
+
+4. 继续步骤2：安装Java开发工具包。
+
+* Ubuntu
+
+1.将操作系统版本的cloudera.list文件下载到cloudera manager服务器主机上的/etc/apt/sources.list.d/目录。
+  
+  可以在Cloudera Manager 6版本的repo文件列中找到URL，并下载要安装的Cloudera Manager版本的信息表。
+  
+2. 导入存储库签名GPG密钥：
+
+  ```
+  wget https://archive.cloudera.com/cm6/6.2.0/ubuntu1604/apt/archive.key
+  sudo apt-key add archive.key
+  ```
+  
+3. 通过运行以下命令更新系统包索引：
+
+  `sudo apt-get update`
+  
+4. 继续步骤2：安装Java开发工具包。
+
+### 2.2 安装JDK
+
+对于JDK，可以Cloudera使用Cloudera Manager提供JDK版本,直接来自Oracle的Oracle JDK，OpenJDK。Cloudera支持的大多数Linux发行版都包括OpenJDK，但如果需要，可手动安装。
+
+OpenJDK支持Cloudera Enterprise 6.1.0及更高版本，以及Cloudera Enterprise 5.16.0及更高版本。
+继续阅读：
+
+#### 2.2.1. 要求
+* JDK必须是64位。不要使用32位JDK。
+* 已安装的JDK必须是支持的版本，如Java要求中所记载的那样。
+* 每个集群主机上必须安装相同版本的JDK。
+* JDK必须安装在/Ur/Java/JDK版本。
+
+*注意*：
+
+    如果JDK安装在不同的位置，在安装cloudera manager之前设置java_home环境变量。如果无法在环境中设置java_home，请使用cloudera manager serer主机上的/etc/cloudera-pre-install/CLOUDERA_SKIP_JAVA_INSTALL_CHECK路径创建一个空文件。这将导致安装过程在安装Cloudera管理器服务器和后台程序包时跳过任何Java检查。
+
+*重要*：
+
+    * Cloudera Enterprise 6支持的RHEL兼容和Ubuntu操作系统默认情况下都对票据使用AES-256加密。为了支持在低于1.8U161的JDK版本中的AES-256位加密，必须在所有集群和Hadoop用户机上安装Java加密扩展（JCE）无限强度管辖权策略文件。Cloudera Manager可以自动安装策略文件，也可以手动安装。有关jce策略文件安装说明，请参阅jce_policy-x.zip文件中包含的readme.txt文件。JDK 1.8U161及更高版本默认情况下启用无限制强度加密，不需要策略文件。
+    
+    * 在SLE平台上，不要安装或尝试使用与SLE发行捆绑的IBM Java版本。使用该版本时，CDH无法正确运行。
+
+#### 2.2.2. 使用Cloudera Manager安装Oracle JDK
+
+完成步骤1:为Cloudera Manager配置存储库后，可以使用包管理器在Cloudera Manager服务器主机上安装Oracle JDK，如下所示：
+
+* RHEL兼容
+
+  `sudo yum install oracle-j2sdk1.8`
+  
+* SLES
+
+  `sudo zypper install oracle-j2sdk1.8`
+  
+* Ubuntu
+
+  `sudo apt-get install oracle-j2sdk1.8`
+
+在接下来的步骤中，您可以使用ClouderaManager在其余集群主机上安装JDK。继续步骤3：安装Cloudera Manager服务器。
+
+#### 2.2.3 手动安装Oracle JDK
+OracleJDK安装程序既可以作为基于RPM的系统的基于RPM的安装程序，也可以作为.tar.gz文件提供。这些说明用于.tar.gz文件。
+
+1. 下载来自JavaSE 8下载的Oracle JDK的64位支持版本之一的.TAR.Gz文件。（此链接在写入时是正确的，但可以更改。）
+
+  *注意* ：如果要使用wget等实用程序直接下载JDK，则必须通过配置头文件来接受Oracle许可证，这些头文件经常更新。博客文章和问答网站可以很好地提供有关如何使用wget下载特定JDK版本的信息。
+
+2. 提取JDK到/UR/Java/JDK版本。例如：
+
+  `tar xvfz /path/to/jdk-8u<update_version>-linux-x64.tar.gz -C /usr/java/`
+  
+3. 在所有群集主机上重复此过程。完成后，继续执行步骤3:安装Cloudera Manager服务器。
+
+#### 2.2.4 手动安装OpenJDK
+在安装Cloudera Manager和CDH之前，请执行本节中的步骤，在集群中的所有主机上安装OpenJDK。
+
+安装Cloudera Enterprise时，Cloudera Manager提供了安装Oracle JDK的选项。取消选择此选项。
+
+有关Cloudera企业版支持哪些JDK版本的信息，请参阅支持的JDK。
+
+注意：如果要启用自动TLS，请注意以下事项：
+您可以指定一个PEM文件，该文件包含要导入到自动TLS信任库中的受信任CA证书。如果要使用OpenJDK附带的Cacerts信任库中的证书，必须首先将信任库转换为PEM格式。但是，OpenJDK附带了一些中间证书，这些证书无法导入到Auto-TLS信任库中。在将PEM文件导入auto-tls信任库之前，必须从PEM文件中删除这些证书。从au所在的集群升级到openjdk时不需要这样做。
+
+* RHEL
+
+  `su -c yum install java-1.8.0-openjdk-devel`
+
+* Ubuntu
+
+  `sudo apt-get install openjdk-8-jdk`
+
+* SLES
+
+  `sudo zypper install java-1_8_0-openjdk-devel`
