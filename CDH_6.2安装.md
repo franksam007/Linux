@@ -863,3 +863,21 @@ OracleJDK安装程序既可以作为基于RPM的系统的基于RPM的安装程�
 * SLES
 
   `sudo zypper install java-1_8_0-openjdk-devel`
+
+## 2.3. Cloudera Manager Server
+### 2.3.1. 安装Cloudera Manager包
+在Cloudera Manager服务器主机上，键入以下命令以安装Cloudera Manager包。
+
+* RHEL、CentOS、Oracle Linux
+
+  `sudo yum install cloudera-manager-daemons cloudera-manager-agent cloudera-manager-server`
+
+* SLES
+
+  `sudo zypper install cloudera-manager-daemons cloudera-manager-agent cloudera-manager-server`
+
+* Ubuntu
+
+  `sudo apt-get install cloudera-manager-daemons cloudera-manager-agent cloudera-manager-server`
+
+2. 如果Oracle数据库用于Cloudera Manager服务器的，在Cloudera Manager服务器主机上编辑/etc/default/cloudera-scm-server文件。找到以export CMF_JAVA_OPTS开头的行，并将-Xmx2G选项更改为-Xmx4G。
