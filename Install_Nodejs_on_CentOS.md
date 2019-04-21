@@ -14,6 +14,10 @@ Run the following curl command to add the NodeSource yum repository to your syst
 
 `curl -sL https://rpm.nodesource.com/setup_10.x | sudo bash -`
 
+Ubuntu上使用
+
+`curl -sL https://deb.nodesource.com/setup_10.x | bash -`
+
 ## 2. 安装Node.js和npm
 Once the NodeSource repository is enabled, install Node.js and npm by typing:
 
@@ -21,6 +25,19 @@ Once the NodeSource repository is enabled, install Node.js and npm by typing:
 
 When prompted to import the repository GPG key, type y, and press Enter.
 
+Ubuntu上使用
+```
+sudo apt-get install -y nodejs
+sudo apt-get install gcc g++ make
+```
+
+安装yarn
+
+```
+curl -sL https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
+echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
+sudo apt-get update && sudo apt-get install yarn
+```
 
 ## 3. 验证Node.js和npm安装
 To check that the installation was successful, run the following commands which will print the Node.js and npm versions.
