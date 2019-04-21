@@ -1372,5 +1372,59 @@ Cloudera Manager Server包含一个脚本，可以为自己创建和配置数据
 
     *注意* ：Cloudera Manager不支持更改已安装帐户的管理员用户名。运行安装向导后，可以使用Cloudera Manager更改密码。虽然不能更改管理员用户名，但可以添加新用户，为新用户分配管理权限，然后删除默认管理员帐户。
 
-    登录后，安装向导将启动。以下部分将指导您完成安装向导的每个步骤
+    登录后，安装向导将启动，按照步骤安装主机、建立集群。
 
+### 2.7. 建立集群
+
+#### 2.7.1. 选择服务
+
+选择服务页面允许选择要安装和配置的服务。确保拥有要使用的服务的适当许可证密钥。您可以选择：
+
+* Essentials: HDFS, YARN (MapReduce 2 Included), ZooKeeper, Oozie, Hive, and Hue
+* Data Engineering: HDFS, YARN (MapReduce 2 Included), ZooKeeper, Oozie, Hive, Hue, and Spark
+* Data Warehouse: HDFS, YARN (MapReduce 2 Included), ZooKeeper, Oozie, Hive, Hue, and Impala
+* Operational Database: HDFS, YARN (MapReduce 2 Included), ZooKeeper, Oozie, Hive, Hue, and HBase
+* All Services (Cloudera Enterprise Data Hub): HDFS, YARN (MapReduce 2 Included), ZooKeeper, Oozie, Hive, Hue, HBase, Impala, Solr, Spark, and Key-Value Store Indexer
+* Custom Services: Choose your own services. Services required by chosen services will automatically be included. Flume can be added after your initial cluster has been set up. 
+
+选择要添加的服务后，单击“继续”。将显示“分配角色”页面。
+
+#### 2.7.2. 指派角色
+
+“分配角色”页建议为群集中的主机分配角色。可以单击角色的主机名来选择其他主机。还可以单击“按主机查看”按钮查看分配给主机的所有角色。
+
+要查看推荐的角色分配，请参阅推荐的群集主机和角色分配( https://www.cloudera.com/documentation/enterprise/6/6.2/topics/cm_ig_host_allocations.html#host_role_assignments )。
+
+为服务分配所有角色后，单击“继续”。显示“设置数据库”页。
+
+#### 2.7.3. 设置数据库
+
+在“设置数据库”页上，可以输入在步骤4:安装和配置数据库中创建的数据库主机、名称、用户名和密码。对于支持它的服务，可以使用JDBC URL覆盖添加更细粒度的定制。
+
+重要提示：Hive服务目前是唯一支持JDBC URL覆盖的服务。
+
+选择数据库类型并输入每个服务的数据库名称、用户名和密码。对于mariadb，选择mysql。
+
+对于支持它的服务，要指定JDBC URL覆盖，请在“使用JDBC URL覆盖”下拉菜单中选择“是”。有关JDBC URL格式的信息，请参阅为数据库连接指定JDBC URL覆盖。还必须指定数据库类型、用户名和密码。
+
+单击测试连接以验证设置。如果连接成功，则每个服务旁边都会出现一个绿色的复选标记和“成功”一词。如果有任何问题，将在连接失败的服务旁边报告错误。
+
+确认每个连接成功后，单击“继续”。将显示“审阅更改”页。
+
+#### 2.7.4. 回顾变化
+
+“查看更改”页列出了几个配置参数（包括数据目录）的默认设置和建议设置。
+
+警告：不要在NAS设备上放置datanode数据目录。调整NAS的大小时，可以删除块副本，从而导致块丢失。
+
+查看并进行任何必要的更改，然后单击“继续”。将显示“命令详细信息”页。
+
+#### 2.7.5. 命令细节
+
+“命令详细信息”页列出了第一个运行命令的详细信息。可以展开正在运行的命令以查看任何步骤的详细信息，包括日志文件和命令输出。可以通过选择“显示所有步骤”、“仅显示失败的步骤”或“仅显示正在运行的步骤”来筛选视图。
+
+第一次运行命令完成后，单击继续转到摘要页。
+
+#### 2.7.6. 总结
+
+摘要页报告安装向导的成功或失败。单击“完成”完成向导。安装完成。
