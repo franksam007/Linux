@@ -153,23 +153,24 @@ gunicorn --bind  0.0.0.0:8088 \
 ========================
 
 下面为直接安装方式
-# Install superset
+1. Install supersets
+
 pip install superset
 
-# Initialize the database
+2.Initialize the database
 superset db upgrade
 
-# Create an admin user (you will be prompted to set a username, first and last name before setting a password)
+3. Create an admin user (you will be prompted to set a username, first and last name before setting a password)
 $ export FLASK_APP=superset
 flask fab create-admin
 
-# Load some data to play with
+4. Load some data to play with
 superset load_examples
 
-# Create default roles and permissions
+5. Create default roles and permissions
 superset init
 
-# To start a development web server on port 8088, use -p to bind to another port
+6. To start a development web server on port 8088, use -p to bind to another port
 superset run -p 8080 --with-threads --reload --debugger
 
 
