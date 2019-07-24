@@ -149,6 +149,31 @@ gunicorn --bind  0.0.0.0:8088 \
 
 可以用刚才设置的账号登录了。
 
+
+========================
+
+下面为直接安装方式
+# Install superset
+pip install superset
+
+# Initialize the database
+superset db upgrade
+
+# Create an admin user (you will be prompted to set a username, first and last name before setting a password)
+$ export FLASK_APP=superset
+flask fab create-admin
+
+# Load some data to play with
+superset load_examples
+
+# Create default roles and permissions
+superset init
+
+# To start a development web server on port 8088, use -p to bind to another port
+superset run -p 8080 --with-threads --reload --debugger
+
+
+
 ## 二、汉化
 
 可以看到Superset自身支持国际化，右上角可以切换语言。但是使用中文时，汉化的不是很完全，需要自己动手做些事情。
