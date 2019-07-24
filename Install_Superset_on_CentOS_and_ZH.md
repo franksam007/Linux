@@ -210,6 +210,38 @@ LANGUAGES = {
 * html文件被编辑的部分 格式为 {{\_("Add Filter")}} 
 * .py文件被编辑的部分 注意两个变量: list_columns , label_columns, 使用\_("msg")、\_\_("msg")等格式。
 
+#### 注意需要更改的一些文件包括
+
+
+更新图像
+```
+\superset\assets\images\s.png
+\superset\assets\images\superset.png
+\superset\assets\images\superset-logo@2x.png
+```
+
+页面添加翻译字符串封装
+```
+\superset\templates\email\role_extended.txt
+\superset\templates\email\role_granted.txt
+\superset\templates\superset\import_dashboards.html
+\superset\templates\superset\paper-theme.html
+\superset\templates\superset\theme.html
+\superset\templates\superset\traceback.html
+\superset\assets\src\explore\components\QueryAndSaveBtns.jsx
+\superset\assets\src\SqlLab\components\QuerySearch.jsx
+```
+
+superset/views/core.py
+    def validate_sql_json(self)
+	...
+	        msg = _(
+                f"{validator.name} was unable to check your query.\nPlease "
+                "make sure that any services it depends on are available\n"
+                f"Exception: {e}"
+            )
+	...
+	此部分在抽取消息是，报validator未定义错误，暂时取消_()函数的包装
 
 ### 翻译messages.po文件
 ```
