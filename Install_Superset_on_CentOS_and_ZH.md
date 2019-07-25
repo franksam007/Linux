@@ -231,7 +231,7 @@ LANGUAGES = {
 \superset\assets\src\explore\components\QueryAndSaveBtns.jsx
 \superset\assets\src\SqlLab\components\QuerySearch.jsx
 ```
-
+```
 superset/views/core.py
     def validate_sql_json(self)
 	...
@@ -241,7 +241,9 @@ superset/views/core.py
                 f"Exception: {e}"
             )
 	...
-	此部分在抽取消息是，报validator未定义错误，暂时取消_()函数的包装
+	
+```
+	此部分在抽取消息是，报validator未定义错误，暂时取消\_()函数的包装
 
 ### 翻译messages.po文件
 ```
