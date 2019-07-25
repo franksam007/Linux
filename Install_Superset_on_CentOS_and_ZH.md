@@ -291,7 +291,16 @@ superset是使用python的一个框架（reactjs?），将jsx文件（类似java
 ### 重新编译、安装、启动Superset
 
 这次再刷新页面，清空缓存，大部分已经汉化了。
+
 但是还是有些没有汉化到的地方。很遗憾，这部分大多是写在代码里了,只能一个个修改了。
+
+重新编译前，需要清除以下目录，否则`python setup.py install`并不更新相应程序：
+```
+顶层/apache_superset.egg-info
+顶层/build
+顶层/dist
+顶层/venv/lib/python3.6/site-packages/apache_superset-0.999.0.dev0-py3.6.egg
+```
 
 在
 
@@ -331,7 +340,7 @@ superset/templates
 flash_appbuilder/templates
 
 注：如果这里模板调用找不到的话 在和superset同级的flash_appbuilder/templates里面找，
-    这两个文件夹是可以相互调用的.（千万注意，这是一个坑~坑死我了~~~） 
+    这两个文件夹是可以相互调用的.（千万注意） 
     两个模板有很多不起作用的模板，不知道为什么要留在里面，增加了很多不必要的难度
 ```
 
