@@ -221,14 +221,14 @@ LANGUAGES = {
 #### 注意需要更改的一些文件包括
 
 
-更新图像
+##### 更新图像
 ```
 \superset\assets\images\s.png
 \superset\assets\images\superset.png
 \superset\assets\images\superset-logo@2x.png
 ```
 
-页面添加翻译字符串封装
+##### 页面添加翻译字符串封装
 ```
 \superset\templates\email\role_extended.txt
 \superset\templates\email\role_granted.txt
@@ -252,6 +252,17 @@ superset/views/core.py
 	
 ```
 	此部分在抽取消息是，报validator未定义错误，暂时取消\_()函数的包装
+
+##### 源代码逻辑修改
+1. 表格修改
+```
+\superset\assets\src\profile\components\Favorites.jsx
+\superset\assets\src\profile\components\CreatedContent.jsx
+\superset\assets\src\profile\components\UserInfo.jsx
+\superset\assets\src\profile\components\RecentActivity.jsx
+```
+用到了`\superset\assets\src\components\TableLoader.jsx`，而组件使用了reactable-arc中的Table空间，且其columns设置成字符串数组，而原控件支持将columns设为{key, label}对象数组，从而利用label来国际化（汉化），否则表头与作为字符串数组columns中的字段名称相同。
+
 
 ### 翻译messages.po文件
 ```
