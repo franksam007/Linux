@@ -59,6 +59,12 @@ $ sudo yum install docker-ce-<VERSION_STRING> docker-ce-cli-<VERSION_STRING> con
 
 注意：要安装docker-ce、docker-ce-cli、containerd.io三个包
 
+### 启动服务
+```
+sudo systemctl enable docker #系统启动时自动启动
+sudo systemctl start docker #启动服务
+```
+
 ## Install docker compose
 1、下载docker compose
 
