@@ -229,3 +229,49 @@ Install development tools
 To be able to build native modules from npm we will need to install the development tools and libraries:
 
 `sudo yum install gcc-c++ make`
+
+# 离线安装npm包
+
+## 1. 使用npm link（以pm2为例）
+使用npm link的方式是最常用的方法，具体做法是在联网机器上下载pm2的源码并安装好依赖，拷贝到离线服务器上，最后借助npm link将pm2链接到全局区域。
+
+首先，将pm2的源代码克隆下来：
+
+`$ git clone https://github.com/Unitech/pm2.git`
+
+然后进入到pm2项目中，安装好所有的依赖：
+
+```
+$ cd pm2
+$ npm install
+```
+
+将安装好依赖的pm2文件夹拷贝到目标服务器上，进入pm2目录链接到全局区域：
+```
+$ cd pm2
+$ npm link
+```
+这种方式最关键的是借助npm link完成链接，但npm link这条命令本意是设计给开发人员调试用的。但开发人员开发某个全局命令工具的时候，通过将命令从本地工程目录链接到全局，这样调试的时候，可以实时查看本地代码在全局环境下的执行情况。所以，npm link的项目需要安装所有的依赖，包括dependencies以及devDependencies，而我们如果只是使用而不是开发某个包的话，正常情况下不应该安装devDependencies。
+
+总而言之，这种方式优点是比较简单，缺点是安装了不需要的devDependencies，对于有“洁癖”的人是难以忍受的。
+
+## 2. 使用npm bundle
+另外一种更干净方法是使用npm-bundle工具将pm2的所有依赖打包，然后到目标服务器上使用npm install <tarball file>安装。
+
+首先在联网机器上安装npm-bundle工具：
+
+`$ npm install -g npm-bundle`
+
+然后打包pm2：
+
+`$ npm-bundle pm2`
+
+上面的命令会生成一个tgz的包文件，复制到目标服务器上安装：
+
+`$ npm install -g ./pm2-3.2.2.tgz`
+
+npm-bundle的本质是借助npm pack来实现打包的。npm pack会打包包本身以及bundledDependencies中的依赖，npm-bundle则是将pm2的所有dependencies记录到bundledDependencies，来实现所有依赖的打包。
+
+这种方式不需要安装多余的devDependencies，并且不需要克隆pm2的源码，比第一种方法更方便。
+
+注意：npm-bundle对于scoped packages的处理有bug，不能正确地打包，这时考虑采用第一种方式。
