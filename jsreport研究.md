@@ -1,32 +1,32 @@
 # jsreport研究
-# 目录
+# 目录<a name='toc'></a>
 1. [CentOS安装](#install)
 
-  1.1 [安装Nodejs](#install_nodejs)
+    1.1 [安装Nodejs](#install_nodejs)
   
-  1.2 [安装jsreport](#install_jsreport)
+    1.2 [安装jsreport](#install_jsreport)
 
 2. [配置](#config)
   
-  2.1 [配置来源](#config_source)
+    2.1 [配置来源](#config_source)
   
-  2.2 [配置扩展](#config_extension)
+    2.2 [配置扩展](#config_extension)
   
-  2.3 [Web服务器配置](#web_config)
+    2.3 [Web服务器配置](#web_config)
   
-  2.4 [存储配置](#store_config)
+    2.4 [存储配置](#store_config)
   
-  2.5 [目录配置](#dir_config)
+    2.5 [目录配置](#dir_config)
   
-  2.6 [允许本地文件和本地模块](#allow_local)
+    2.6 [允许本地文件和本地模块](#allow_local)
   
-  2.7 [渲染配置](#render_config)
+    2.7 [渲染配置](#render_config)
   
-  2.8 [模板引擎配置](#tpl_engine_config)
+    2.8 [模板引擎配置](#tpl_engine_config)
   
-  2.9 [日志配置](#log_config)
+    2.9 [日志配置](#log_config)
   
-  2.10 [配置文件示例](#config_sample)
+    2.10 [配置文件示例](#config_sample)
 
 ## 1. CentOS安装<a name='install'></a>
 jsreport整体上利用nodejs开发，界面主要体现在jsreport-studio上。
@@ -413,7 +413,7 @@ jsreport中的默认记录器配置：
 
 * logger.silent _(boolean)_ :方便选项，使所有已配置的输出静音（不存储日志）。默认值：false
 
-### 2.10 配置文件示例<a name='config_sample'></a>
+### 2.10 配置文件示例<a name='config_sample'></a>  [返回目录](#toc)
 ```
 {   
     "store": { "provider": "fs" },   
