@@ -29,12 +29,19 @@
     2.10 [配置文件示例](#config_sample)
 
 3. [存储配置详解](#store_config_detail)
+
     3.1 [默认文件系统存储](#fs_store)
+    
     3.2 [模板存储扩展](#store_extension)
+    
     3.3 [不同存储之间迁移](#store_migration)
+    
     3.4 [REST API](#store_api)
+    
     3.5 [javascript API](#js_api)
     
+[许可](#license)
+
 ## 1. CentOS安装<a name='install'></a>    [返回目录](#toc)
 jsreport整体上利用nodejs开发，界面主要体现在jsreport-studio上。
 
@@ -515,3 +522,6 @@ const templates = await reporter.documentStore.collection("templates")
 ```
 
 
+## 许可<a name='license'></a>    [返回目录](#toc)
+
+许可有jsreport_licensing包负责，详见main.js的267行。
