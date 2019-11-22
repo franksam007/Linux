@@ -1,8 +1,32 @@
 # jsreport研究
 # 目录
 1. [CentOS安装](#install)
+
   1.1 [安装Nodejs](#install_nodejs)
-  [配置文件示例](#config_sample)
+  
+  1.2 [安装jsreport](#install_jsreport)
+
+2. [配置](#config)
+  
+  2.1 [配置来源](#config_source)
+  
+  2.2 [配置扩展](#config_extension)
+  
+  2.3 [Web服务器配置](#web_config)
+  
+  2.4 [存储配置](#store_config)
+  
+  2.5 [目录配置](#dir_config)
+  
+  2.6 [允许本地文件和本地模块](#allow_local)
+  
+  2.7 [渲染配置](#render_config)
+  
+  2.8 [模板引擎配置](#tpl_engine_config)
+  
+  2.9 [日志配置](#log_config)
+  
+  2.10 [配置文件示例](#config_sample)
 
 ## 1. CentOS安装<a name='install'></a>
 jsreport整体上利用nodejs开发，界面主要体现在jsreport-studio上。
@@ -10,7 +34,7 @@ jsreport整体上利用nodejs开发，界面主要体现在jsreport-studio上。
 ### 1.1 安装Nodejs<a name='install_nodejs'></a>
 jsreport需要node.js (>= 8.9)和npm (>= 6.x)。
 
-### 1.2 安装jsreport
+### 1.2 安装jsreport<a name='install_jsreport'></a>
 #### 一般流程
 利用npm安装jereport
 ```
@@ -93,7 +117,7 @@ CentOS上的依赖包：
 
 `yum update nss -y`
 
-## 配置
+## 2. 配置<a name='config'></a>
 
 使jsreport适应需求的最简单方法是更改其配置。jsreport配置提供了许多选项，例如更改http端口，将存储库提供程序设置为不同的机制等等。
 
@@ -101,7 +125,7 @@ CentOS上的依赖包：
 
 `jsreport help config`
 
-### 配置来源(Configuration sources)
+### 2.1 配置来源(Configuration sources)<a name='config_source'></a>
 jsreport将配置文件中的配置，环境变量，命令行参数以及应用程序代码中的配置直接按此确切顺序合并。
 
 #### 配置文件
@@ -153,7 +177,7 @@ set extensions:authentication:admin:username=john
 jsreport start
 ```
 
-### 命令行参数
+#### 命令行参数
 命令行参数也被解析。例如，这对于更改端口非常方便：
 
 `jsreport start --httpPort=3000`
@@ -162,7 +186,7 @@ jsreport start
 
 `jsreport start --extensions.authentication.admin.username=john`
 
-### 应用代码
+#### 应用代码
 
 最后一个选项是编辑server.js文件，这是默认安装的一部分。将jsreport集成到现有的node.js应用程序中时，这通常很常见。请注意，如果使用预编译的jsreport二进制文件，则无法使用此方法。
 
@@ -172,7 +196,7 @@ const jsreport = require('jsreport')({
 })
 ```
 
-### 配置扩展
+### 2.2 配置扩展<a name='config_extension'></a>
 每个扩展名（配方，存储...）通常都提供一些选项，您可以应用这些选项并调整其行为。这些选项通常可以通过顶级extensions属性下的标准配置来设置，您可以在其中将带有扩展名的特定扩展选项放入其中。例如，可以在配置中的相同命名节点下配置身份验证。
 ```
 "extensions": {
@@ -221,7 +245,7 @@ extensions_htmlToXlsx_someConfig=value jsreport start
   }
 }
 ```
-### Web服务器配置
+### 2.3 Web服务器配置<a name='web_config'></a>
 * httpPort _(number)_ ：运行jsreport的 http端口，如果同时指定`httpPort`和`httpsPort`，则jsreport将自动创建从http到https的http重定向（如果指定了`httpPort`和h`ttpsPort`），则将使用默认`process.env.PORT`
 
 * httpsPort _(number)_ ：jsreport的https端口
@@ -248,20 +272,20 @@ certificate _object_ ：https所使用key和cert文件的路径
 
 * mountOnAppPath _(boolean)_ ：将此选项与一起使用appPath。它指定是否所有jsreport路由都应appPath以前缀提供，因此使appPath应用程序成为新的根URL
 
-### 存储配置
+### 2.4 存储配置<a name='store_config'></a>
 * store _(object)_ ：jsreport支持多种实现来存储模板。具体实现是基于store.provider属性来区分的。预先创建的配置文件中的预定义值是fs使用jsreport-fs-store在文件系统上存储报告模板的值。另外，可以安装其他扩展提供模板存储并进行更改store以反映它。您可以在此处找到可用商店驱动程序的列表，以及如何配置它们的更多详细信息。
 
 * blobStorage _)object)_ :可选，指定用于存储报告的存储类型。具体实现是基于blobStorage.provider属性来区分的。它可以是fs，memory或gridFS。在完整版jsreport中默认为fs，或在jsreport集成到现有的node.js应用程序时默认memory。
 
-### 目录配置
+### 2.5 目录配置<a name='dir_config'></a>
 * rootDirectory_(string)_ ：（可选）指定应用程序的根目录和jsreport在哪里搜索扩展名
 
 * tempDirectory_(string)_ ：（可选）指定应用程序存储临时文件的目录的绝对或相对路径
 
-### 允许本地文件和本地模块
+### 2.6 允许本地文件和本地模块<a name='allow_local'></a>
 * allowLocalFilesAccess _(boolean)_ ：为true时，此属性指定jsreport在渲染执行期间应允许访问本地文件系统和使用自定义nodejs模块
 
-### 渲染配置
+### 2.7 渲染配置<a name='render_config'></a>
 缺省情况下，jsreport使用专用进程来呈现pdf或脚本。该解决方案在某些带有代理的云和公司环境中更有效。但是，对于其他情况，例如，使用phantomjs时，最好在多个请求上重用让nodejs worker工作。可以使用此配置选项来实现。
 ```
 "phantom": {     
@@ -272,7 +296,7 @@ certificate _object_ ：https所使用key和cert文件的路径
 }
 ```
 
-### 模板引擎配置
+### 2.8 模板引擎配置<a name='tpl_engine_config'></a>
 * templatingEngines _(object)_ ：（可选）此属性用于配置执行渲染任务的组件。此组件用于在渲染过程中或在脚本扩展中执行javascript模板引擎。
 
 * templatingEngines.strategy _(dedicated-process | http-server | in-process)_ ：第一个策略为每个任务使用一个新的nodejs实例。第二种策略在多个请求上重用每个实例。在http-server性能更好的地方，默认dedicated-process值更适合具有代理的某些云和公司环境。最后一个in-process策略只是在同一过程中运行脚本和帮助程序。这是最快的方法，但是将这种策略与用户模板一起使用可能并不安全，因为用户模板可能存在无限循环或其他可能导致应用程序终止的严重错误。in-process当您需要使用node.js调试工具调试jsreport时，该策略也很方便。
@@ -289,7 +313,7 @@ templatingEngines.portRightBoundary _(number)_ ：为脚本执行服务器设置
 
 * templatingEngines.allowedModules _(array)_ ：设置允许在模板引擎的助手内部使用（利用require导入）的外部模块。例如：`allowedModules: ["lodash", "request"]`，也可以通过设置`allowedModules: "*"`允许导入任何外部模块。如果想控制脚本而不是帮助程序，则须检查相应的文档
 
-### 日志配置
+### 2.9 日志配置<a name='log_config'></a>
 注意：jsreport日志是使用winston包实现的，并且它的许多概念都适用于jsreport日志配置。
 
 * logger _(object)_ ：要完全控制jsreport的日志，可以使用对象声明输出（应将日志发送到哪里）和日志级别：
@@ -389,7 +413,7 @@ jsreport中的默认记录器配置：
 
 * logger.silent _(boolean)_ :方便选项，使所有已配置的输出静音（不存储日志）。默认值：false
 
-### 配置文件示例<a name='config_sample'></a>
+### 2.10 配置文件示例<a name='config_sample'></a>
 ```
 {   
     "store": { "provider": "fs" },   
