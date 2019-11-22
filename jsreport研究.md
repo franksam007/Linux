@@ -1,9 +1,13 @@
 # jsreport研究
+# 目录
+1. [CentOS安装](#install)
+  1.1 [安装Nodejs](#install_nodejs)
+  [配置文件示例](#config_sample)
 
-## 1. CentOS安装
+## 1. CentOS安装<a name='install'></a>
 jsreport整体上利用nodejs开发，界面主要体现在jsreport-studio上。
 
-### 1.1 安装Nodejs
+### 1.1 安装Nodejs<a name='install_nodejs'></a>
 jsreport需要node.js (>= 8.9)和npm (>= 6.x)。
 
 ### 1.2 安装jsreport
@@ -385,7 +389,7 @@ jsreport中的默认记录器配置：
 
 * logger.silent _(boolean)_ :方便选项，使所有已配置的输出静音（不存储日志）。默认值：false
 
-### 配置文件示例
+### 配置文件示例<a name='config_sample'></a>
 ```
 {   
     "store": { "provider": "fs" },   
