@@ -1,5 +1,5 @@
 # jsreport研究
-# 目录<a name='toc'></a>
+## 目录<a name='toc'></a>
 1. [CentOS安装](#install)
 
     1.1 [安装Nodejs](#install_nodejs)
