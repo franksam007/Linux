@@ -277,58 +277,6 @@ certificate _object_ ：https所使用key和cert文件的路径
 
 * blobStorage _)object)_ :可选，指定用于存储报告的存储类型。具体实现是基于blobStorage.provider属性来区分的。它可以是fs，memory或gridFS。在完整版jsreport中默认为fs，或在jsreport集成到现有的node.js应用程序时默认memory。
 
-jsreport支持templates、assets、scripts和所有其他实体的持久性存储。这有助于涵盖完整的报告场景，包括在Studio中设计报告，将模板保存到模板存储中以及引用它们并根据生产中的输入数据呈现最终报告。
-
-默认的jsreport模板存储基于文件系统，但这不是唯一的选择。jsreport在持久性存储周围提供统一的API，该API由自定义扩展实现，该自定义扩展提供了对其他介质（如sql数据库等）的访问层。从文件系统持久性切换到例如mongodb只需要安装自定义扩展名并更改连接字符串。
-
-#### 默认文件系统存储
-jsreport默认将模板存储到文件系统。此默认实现使用模板和其他实体定义生成易于阅读的目录结构。使用任意文本编辑器可以很容易地编辑这种结构，可以将其部署到产品中，还可以使用git或其他源代码控制进行版本控制。文件系统实现最终还支持基于云的“存储”，例如AWS S3或Azure存储。
-
-细节可参考https://jsreport.net/learn/fs-store
-
-#### 模板存储扩展
-可以将实现模板存储的扩展与任何其他jsreport扩展一起安装。通常，它仅需要运行npm install jsreport-xxx并重新启动jsreport服务器。自动jsreport扩展发现将在以后找到并加载它。
-
-使用特定的存储扩展需要更改store.provider的配置。
-```
-"store": {
-  "provider": "mongodb",
-  "address": "127.0.0.1",
-  "databaseName" : "std"
-}
-```
-扩展都需要在store config中设置特定选项。
-
-当前支持的模板存储实现包括：
-
-* jsreport-fs-store	：文件系统+ Azure存储+ AWS S3
-* jsreport-mssql-store	：Microsoft SQL服务器
-* jsreport-postgres-store ：PostgreSQL
-* jsreport-mongodb-store ：MongoDB
-
-注意，实现模板存储的扩展仅用于持久化jsreport实体。其目的不是从源数据库加载报表输入数据。此功能通过自定义脚本扩展提供。
-
-#### 不同存储之间迁移
-jsreport import-export扩展程序能够将数据从每个受支持的商店实现导出到单个zip包中。然后可以将此包导入回其他甚至可以使用不同商店实现的jsreport实例。这使您可以在本地使用基于文件系统的存储，并轻松地将相同的数据导入到运行mongo的生产服务器中。
-
-#### REST API
-扩展或工作室通常在内部使用模板存储，以查询和更新诸如报告模板之类的实体。但是，模板存储API也通过基于统一odata的REST API 公开。任何客户端都可以使用它来远程查询或更新基础jsreport数据。无论基础存储实现是基于SQL还是文件系统，API始终相同。
-
-#### javascript API
-jsreport自定义扩展作者也可以直接通过javascript API与商店进行交互。也可以在node.js应用程序中使用它来编写自定义数据导入/导出。
-
-该API与mongo兼容
-```
-const templates = await reporter.documentStore.collection("templates")    
-    .find({ "shortid": "foo"})    
-    .sort({ "name": 1 })    
-    .limit(10)    
-    .toArray()
-```
-
-
-
-
 ### 2.5 目录配置<a name='dir_config'></a>    [返回目录](#toc)
 * rootDirectory_(string)_ ：（可选）指定应用程序的根目录和jsreport在哪里搜索扩展名
 
@@ -509,3 +457,54 @@ jsreport中的默认记录器配置：
    }
 }
 ```
+## 3. 存储配置详解<a name='store_config_detail'></a>    [返回目录](#toc)
+jsreport支持templates、assets、scripts和所有其他实体的持久性存储。这有助于涵盖完整的报告场景，包括在Studio中设计报告，将模板保存到模板存储中以及引用它们并根据生产中的输入数据呈现最终报告。
+
+默认的jsreport模板存储基于文件系统，但这不是唯一的选择。jsreport在持久性存储周围提供统一的API，该API由自定义扩展实现，该自定义扩展提供了对其他介质（如sql数据库等）的访问层。从文件系统持久性切换到例如mongodb只需要安装自定义扩展名并更改连接字符串。
+
+### 3.1 默认文件系统存储<a name='fs_store'></a>    [返回目录](#toc)
+jsreport默认将模板存储到文件系统。此默认实现使用模板和其他实体定义生成易于阅读的目录结构。使用任意文本编辑器可以很容易地编辑这种结构，可以将其部署到产品中，还可以使用git或其他源代码控制进行版本控制。文件系统实现最终还支持基于云的“存储”，例如AWS S3或Azure存储。
+
+细节可参考https://jsreport.net/learn/fs-store
+
+### 3.2 模板存储扩展<a name='store_extension'></a>    [返回目录](#toc)
+可以将实现模板存储的扩展与任何其他jsreport扩展一起安装。通常，它仅需要运行npm install jsreport-xxx并重新启动jsreport服务器。自动jsreport扩展发现将在以后找到并加载它。
+
+使用特定的存储扩展需要更改store.provider的配置。
+```
+"store": {
+  "provider": "mongodb",
+  "address": "127.0.0.1",
+  "databaseName" : "std"
+}
+```
+扩展都需要在store config中设置特定选项。
+
+当前支持的模板存储实现包括：
+
+* jsreport-fs-store	：文件系统+ Azure存储+ AWS S3
+* jsreport-mssql-store	：Microsoft SQL服务器
+* jsreport-postgres-store ：PostgreSQL
+* jsreport-mongodb-store ：MongoDB
+
+注意，实现模板存储的扩展仅用于持久化jsreport实体。其目的不是从源数据库加载报表输入数据。此功能通过自定义脚本扩展提供。
+
+### 3.3 不同存储之间迁移<a name='store_migration'></a>    [返回目录](#toc)
+jsreport import-export扩展程序能够将数据从每个受支持的商店实现导出到单个zip包中。然后可以将此包导入回其他甚至可以使用不同商店实现的jsreport实例。这使您可以在本地使用基于文件系统的存储，并轻松地将相同的数据导入到运行mongo的生产服务器中。
+
+### 3.5 REST API<a name='store_api'></a>    [返回目录](#toc)
+扩展或工作室通常在内部使用模板存储，以查询和更新诸如报告模板之类的实体。但是，模板存储API也通过基于统一odata的REST API 公开。任何客户端都可以使用它来远程查询或更新基础jsreport数据。无论基础存储实现是基于SQL还是文件系统，API始终相同。
+
+### 3.6 javascript API<a name='js_api'></a>    [返回目录](#toc)
+jsreport自定义扩展作者也可以直接通过javascript API与商店进行交互。也可以在node.js应用程序中使用它来编写自定义数据导入/导出。
+
+该API与mongo兼容
+```
+const templates = await reporter.documentStore.collection("templates")    
+    .find({ "shortid": "foo"})    
+    .sort({ "name": 1 })    
+    .limit(10)    
+    .toArray()
+```
+
+
