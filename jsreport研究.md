@@ -28,6 +28,13 @@
   
     2.10 [配置文件示例](#config_sample)
 
+3. [存储配置详解](#store_config_detail)
+    3.1 [默认文件系统存储](#fs_store)
+    3.2 [模板存储扩展](#store_extension)
+    3.3 [不同存储之间迁移](#store_migration)
+    3.4 [REST API](#store_api)
+    3.5 [javascript API](#js_api)
+    
 ## 1. CentOS安装<a name='install'></a>    [返回目录](#toc)
 jsreport整体上利用nodejs开发，界面主要体现在jsreport-studio上。
 
@@ -492,10 +499,10 @@ jsreport默认将模板存储到文件系统。此默认实现使用模板和其
 ### 3.3 不同存储之间迁移<a name='store_migration'></a>    [返回目录](#toc)
 jsreport import-export扩展程序能够将数据从每个受支持的商店实现导出到单个zip包中。然后可以将此包导入回其他甚至可以使用不同商店实现的jsreport实例。这使您可以在本地使用基于文件系统的存储，并轻松地将相同的数据导入到运行mongo的生产服务器中。
 
-### 3.5 REST API<a name='store_api'></a>    [返回目录](#toc)
+### 3.4 REST API<a name='store_api'></a>    [返回目录](#toc)
 扩展或工作室通常在内部使用模板存储，以查询和更新诸如报告模板之类的实体。但是，模板存储API也通过基于统一odata的REST API 公开。任何客户端都可以使用它来远程查询或更新基础jsreport数据。无论基础存储实现是基于SQL还是文件系统，API始终相同。
 
-### 3.6 javascript API<a name='js_api'></a>    [返回目录](#toc)
+### 3.5 javascript API<a name='js_api'></a>    [返回目录](#toc)
 jsreport自定义扩展作者也可以直接通过javascript API与商店进行交互。也可以在node.js应用程序中使用它来编写自定义数据导入/导出。
 
 该API与mongo兼容
