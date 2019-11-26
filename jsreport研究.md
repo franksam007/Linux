@@ -48,6 +48,26 @@
     
     4.3 [Scripts](#scripts)
     
+    4.4 [Assets](#assets)
+    
+    4.5 [Child Template](#child_template)
+    
+    4.6 [Report](#report)
+    
+    4.7 [Scheculing](#scheduling)
+    
+    4.8 [Authenticatio](#authentication)
+    
+    4.9 [Authorization](#authorization)
+    
+    4.10 [Public templates](#public_template)
+    
+    4.11 [Resources](#resource)
+    
+    4.12 [Tags](#tag)
+    
+    4.13 [CLI](#cli)
+    
 [许可](#license)
 
 ## 1. CentOS安装<a name='install'></a>    [返回目录](#toc)
@@ -1227,6 +1247,340 @@ Authorization扩展添加到每个jsreport对象readPermissions和editPermission
 
 #### 局限性
 目前仅为管理员用户启用了计划和版本控制扩展。
+
+### 4.10 Public templates<a name='public_template'></a>    [返回目录](#toc)
+使用安全令牌向未经身份验证的用户授予权限的公开报告模板。需要启用身份验证和授权扩展。
+
+身份验证扩展仅向经过身份验证的用户授予对jsreport的访问权限，而授权扩展则确保用户仅对允许的操作具有访问权限。public-templates如果想与没有任何jsreport凭据的人共享模板，此扩展将起作用。
+
+#### 共享模板
+要共享模板，可以使用sharejsreport designer或API中的工具栏按钮。这提供了一个包含安全令牌的公共链接。访问链接将输出通过渲染特定模板生成的报告。
+
+#### API
+要将安全令牌包含在渲染输出中，只需将其添加options.authorization.grantRead或添加grantWrite到正文中：
+```
+POST: api/report
+
+{
+  "template": { ... }
+  "options": {
+    "authorization": {
+      "grantRead": true
+    }
+  }
+}
+```
+
+### 4.11 Resources<a name='resource'></a>    [返回目录](#toc)
+本地化模板或将任何静态JSON附加到呈现过程
+
+#### 基本
+通过Resources扩展可以将多个JSON数据对象附加到报告模板上，以后使用模板引擎或在自定义脚本中方便地访问它们。这对于将常规配置添加到模板或主要本地化模板很有用。
+
+#### 本土化
+此扩展背后的主要思想是将所有可本地化的字符串从报告模板移至JSON资源，然后使用javascript模板引擎将其绑定，而不是对其进行硬编码。然后，此扩展根据请求的语言将正确的可本地化资源推送到呈现过程。
+
+要本地化模板，需要：
+
+* 将包含可本地化字符串的资源附加到模板。每个包含可本地化字符串的资源都必须以语言名称作为前缀。因此，例如附加的资源应该是名称为en-invoice和的数据项de-invoice。
+
+* 在资源菜单的jsreport studio中填充模板默认语言
+
+* 使用模板引擎填充$localizedResource属性中的本地化字符串
+```
+{{:$localizedResource.title}}
+```
+* 当每种语言有多种资源时，请使用资源名称来到达特定的一种
+```
+{{:$localizedResource.invoice.title}}
+{{:$localizedResource.globals.title}}
+```
+* 指定options.language的API调用来指定所需的语言
+
+#### 访问自定义资源
+##### 模板引擎
+每个模板资源都会被解析并提供给模板引擎渲染输入。为了方便起见，以两种形式提供资源。
+
+可以在主对象的$resource属性中找到第一种形式。存储了一个对象，该对象包含按资源名称区分的所有附加资源的数据。
+
+因此，例如带有附加资源的模板：
+
+* 带有名称的数据 config1
+```
+{
+"foo": "this is config1"
+}
+```
+* 带有名称的数据 config2
+```
+{
+"foo2": "this is config2"
+}
+```
+```
+outputs "this is config1" when using jsrender
+{{:$resource.config1.foo}}
+
+output "this is config2" when using jsrender
+{{:$resource.config2.foo2}}
+```
+
+第二种形式在$resources属性中表示为数组。此数组包含每一个附加的资源在它的完整形式包括name，shortid和data资产。这可以在某些高级方案中使用。为了确保实际存储在$resources属性中的内容，可以使用在jsreport中执行的常见方式转储对象。
+```
+//helper function
+function dumpResources(data) {
+  return JSON.stringify(data.$resources);
+}
+```
+```
+print helper function output using jsrender
+{{:~dumpResources(#data}}
+```
+##### 脚本
+自定义jsreport脚本可以使用以下属性：
+```
+//equivalent to request.data.$resources
+request.options.resources
+//equivalent to request.data.$resource
+request.options.resource
+```
+
+#### API
+要在API调用中指定语言，需要language在options对象中添加属性。
+```
+POST: https://jsreport-host/api/report
+Headers：Content-Type: application/json
+BODY:
+
+   {
+      "template": { "shortid" : "g1PyBkARK" },
+      "data" : { ... },
+      "options": { "language": "en" }
+   }
+```
+资源直接存储在模板文档中。除此resources扩展之外，此扩展还将属性defaultLanguage添加到模板文档中。
+```
+GET http://jsreport-host/odata/templates('aaaa')
+
+{
+    "name": "template name",
+    "content": "<h1>Hello world</h1>",
+    "defaultLanguage": "en",
+    ...
+    "resources":{
+        "items":[
+            { "entitySet":"data", "shortid":"NJ5H9pkb"    }
+        ]
+    }
+}
+```
+
+### 4.12 Tags<a name='tag'></a>    [返回目录](#toc)
+用标签组织jsreport对象
+
+#### 基本
+启用tags扩展将为jsreport添加组织功能，从而启用带有标签的jsreport对象的组织，过滤和显示。
+
+#### 创建和使用标签
+可以使用jsreport studio创建标签。可以在其中指定有关标签的信息（名称、颜色、描述等），稍后在创建/编辑其他对象（模板、数据、脚本、资产、图像等）时，可以为这些对象分配一个或多个标签。
+
+#### 配置
+将tags节点添加到标准配置文件。
+```
+"extensions": {
+    "tags" : {
+      // boolean to determine if jsreport studio by default should show objects organized by tags
+        "organizeByDefault": true
+    }
+}
+```
+
+#### API
+可以使用标准的OData API来管理和查询标签实体。例如，可以使用以下命令查询所有标签：
+```
+GET http://jsreport-host/odata/tags
+```
+
+### 4.12 Version Control<a name='tag'></a>    [返回目录](#toc)
+#### 基本
+jsreport扩展添加了对版本控制实体的支持，并为常见命令（如commit，diff，revert或history）提供API以及Studio UI。只需安装扩展程序，就可以在Studio中看到新的用户界面。
+
+#### Git
+默认情况下，扩展使用自己的实现来跟踪更改并将差异存储在额外的实体中。这个非常轻巧的解决方案可与所有受支持的模板存储一起使用。但是，如果使用文件系统存储，则可能希望改用功能更强大的git并跟踪对基础文件所做的更改。
+
+要开始使用本地git，需要另外安装jsreport-version-control-git扩展。
+```
+npm install jsreport-version-control-git
+```
+并将其配置version-control为使用它来跟踪更改。
+```
+{
+  "extensions": {
+    "versionControl": { "provider": "git" }
+  }
+}
+```
+这样可以使UI与使用Plain时的UI相同version-control。但是在其后面，它将在data文件夹中初始化本地git存储库，并将版本跟踪委派给git。请注意，此软件包将git捆绑在内部，无需将其安装在目标计算机上。
+
+### 4.13 CLI<a name='cli'></a>    [返回目录](#toc)
+jsreport的命令行界面
+
+#### 基本
+cli扩展程序提供命令行界面，该界面可以执行一些称为命令的任务。这些命令主要可以从命令行快速启动服务器或调用报表呈现，但是所提供的功能列表cli要长得多。
+
+cli也直接集成到以单个文件可执行形式发布的jsreport中，可参考https://jsreport.net/learn/single-file-executable。
+
+#### 安装
+建议首先在全局安装cli扩展程序，这样做将提供一个全局jsreport命令，可以在命令行的任何位置使用它。
+```
+npm install jsreport-cli -g
+jsreport --help
+```
+如果要安装到现有的node.js应用程序中，请遵循node.js项目集成部分cli，因为这需要一些其他步骤。
+
+#### 用法
+##### 启动jsreport
+如下载页面所述，cli第一个用例通常是jsreport安装和服务器启动。
+```
+jsreport init
+jsreport start --httpPort=6000
+```
+##### 渲染
+cli提供的主要功能是在render命令中实现的报表呈现调用。该命令具有许多变体和开关，但是主要用法如下所示：
+```
+jsreport render
+    --template.name=MyTemplate
+    --data=mydata.json
+    --out=myreport.xlsx
+```
+
+#### 命令
+要获得有关特定命令的帮助，可以键入jsreport <command> -h以获取有关命令的用法和可用选项的一些说明。
+
+以下是支持的命令。
+
+help
+init
+repair
+configure
+win-install
+win-uninstall
+start
+render
+kill
+help
+Command available globally
+
+打印有关命令或特定主题的信息，您可以运行“ jsreport help -h”以获取可用主题的列表
+
+##### init
+Command available globally
+
+初始化当前工作目录以启动jsreport应用程序（创建server.js，jsreport.config.json，package.json并在必要时安装jsreport）。
+
+要查看可用选项和用法示例，请输入jsreport init -h。
+
+##### repair
+Command available globally
+
+修复当前的工作目录以启动jsreport应用程序（如果存在server.js，jsreport.config.json和package.json，则覆盖它们，并在必要时安装jsreport）。
+
+要查看可用选项和用法示例，请输入jsreport repair -h。
+
+##### configure
+Command available globally
+
+根据一些提问生成jsreport配置文件（jsreport.config.json）。
+
+要查看可用选项和用法示例，请输入jsreport configure -h。
+
+##### win-install
+Command only available when local version is installed in your project
+
+将项目安装为Windows服务（仅Windows）
+
+要以生产模式安装服务，请确保在运行命令之前将NODE_ENV环境变量设置为production
+
+要查看可用选项和用法示例，请输入jsreport win-install -h。
+
+已安装的服务使用nssm包装jsreport ，从而增加了自动重启逻辑。该NSSM附加到Windows事件日志，你可以尝试搜索，如果你wan't发现在标准jsreport日志相关信息写入意外错误。
+
+##### win-uninstall
+Command only available when local version is installed in your project
+
+停止并卸载您的项目作为Windows服务（仅Windows）
+
+要查看可用选项和用法示例，请输入jsreport win-uninstall -h。
+
+##### start
+Command only available when local version is installed in your project
+
+启动当前工作目录中存在的jsreport进程/服务器。
+
+要查看可用选项和用法示例，请输入jsreport start -h。
+
+##### render
+Command only available when local version is installed in your project
+
+调用渲染过程。
+
+使用此命令，可以直接从命令行渲染pdf、excel等，如果打算调用多个渲染，建议使用该--keepAlive选项，该选项将在后台启动jsreport（守护进程），并将相同的过程重用于以后的渲染（最佳性能）。
+
+要查看可用选项和用法示例，请输入jsreport render -h。
+
+##### kill
+Command only available when local version is installed in your project
+
+终止守护程序jsreport进程。
+
+使用此命令可以杀死在后台运行的任何jsreport进程（例如，由创建的jsreport进程jsreport render --keepAlive ...）
+
+要查看可用选项和用法示例，请输入jsreport kill -h。
+
+#### node.js项目集成
+cli如果遵循官方的jsreport 下载说明，则默认情况下jsreport 可以使用完整格式。但是如果要将jsreport集成到node.js应用程序中，则需要设置以下内容：
+
+1. 在package.json项目的中声明一个jsreport入口点
+
+jsreport入口点是require并创建jsreport实例的文件，通常是server.js。将需要在package.json其中添加带有项目的jsreport入口点路径的jsreport.entryPoint字段。
+
+package.json正确配置的示例，server.js是项目的jsreport入口点：
+```
+{
+ "name": "jsreport-server",
+ "dependencies": {
+   "jsreport": "2.0.0"
+ },
+ "main": "server.js",
+ "jsreport": {
+   "entryPoint": "server.js"
+ }
+}
+```
+2. 在项目的jsreport入口点中导出jsreport实例
+
+在jsreport入口点文件中（通常server.js），将需要导出项目的jsreport实例，但是由于可能正在使用同一文件来启动jsreport服务器（使用node server.js），因此需要添加特殊条件以支持这两种情况（服务器初始化并导出jsreport实例）。
+
+支持两种情况的jsreport入口点示例：
+```
+// creating a jsreport instance
+const jsreport = require('jsreport')()
+
+if (process.env.JSREPORT_CLI) {
+ // when the file is required by jsreport-cli, export
+ // jsreport instance to make it possible the usage of jsreport-cli
+ module.exports = jsreport
+} else {
+ // when the file is started with node.js, start the jsreport server normally
+ jsreport.init().then(() => {
+   console.log('server started..')
+ }).catch((e) => {
+   // error during startup
+   console.error(e.stack)
+   process.exit(1)
+ })
+}
+```
 
 ## 许可<a name='license'></a>    [返回目录](#toc)
 
