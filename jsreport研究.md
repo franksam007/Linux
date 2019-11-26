@@ -39,6 +39,14 @@
     3.4 [REST API](#store_api)
     
     3.5 [javascript API](#js_api)
+
+4. [扩展](#extensions)
+
+    4.1 [Base](#base)
+    
+    4.2 [Inline Data](#inline_data)
+    
+    4.3 [Scripts](#scripts)
     
 [许可](#license)
 
@@ -520,6 +528,286 @@ const templates = await reporter.documentStore.collection("templates")
     .limit(10)    
     .toArray()
 ```
+
+## 4. 扩展<a name='extensions'></a>    [返回目录](#toc)
+jsreport的所有主要部分（例如模板或pdf渲染）实际上都是扩展。可以打开/关闭它们，甚至创建自己的扩展 ，这些扩展将为模板添加特殊属性或自定义jsreport studio。
+
+### 4.1 Base<a name='base'></a>    [返回目录](#toc)
+自动注入html base tag，以允许相对引用本地样式，图像或脚本
+
+#### 在配置中设置基地址(Base address)
+```
+"extensions": {
+  "base": {
+    "url": "${cwd}/myAssets"
+  },
+  "phantom-pdf": {
+    "allowLocalFilesAccess": true
+  }
+}
+```
+然后，扩展将html base tag注入每个有效的html中：
+```
+<html>
+  <head>
+    <base href="file:///jsreportFolder/myAssets" />
+    <script src="js/jquery.min.js"></script>
+  </head>
+  <body>
+  </body>
+</html>
+```
+基本标记可确保从指定的文件夹中加载相对链接的脚本，图像或样式，而无需其他额外的工作。仅需注意，可能需要在某些pdf渲染配方中启用本地文件访问，例如phantom-pdf using phanton.allowLocalFilesAccess: true选项。
+
+#### 通过cli运行时发送基址(Base address)
+```
+jsreport render
+  --template.engine=none
+  --template.recipe=phantom-pdf
+  --template.content=test.html
+  --options.base=%cd%
+  --out=out.pdf
+ ```
+#### 发送基地址作为api请求的一部分
+```
+POST：http//localhost:5488/api/ report
+
+Headers：内容类型：application / json
+
+{
+  "template": {
+    "content": "<html><head></head><body></body></html>",
+    "recipe": "html",
+    "engine": "handlebars"
+  },
+  "options": {
+    "base": "http://foo.com"
+  }
+}
+```
+
+### 4.2 Inline Data<a name='inline_data'></a>    [返回目录](#toc)
+在模板开发过程中使用样本测试数据
+
+#### 基本
+报告生成过程的输入是报告模板和一些json输入数据。将在运行时将这些数据提供给jsreport API，但是每次想查看报告的外观时调用jsreport API并不是很有效。jsreport带有Data扩展名。
+
+Data 扩展允许直接在jsreport studio中使用JSON语法静态定义输入数据，并轻松测试模板。
+
+#### API
+可以使用标准的OData API来管理和查询data实体。例如，可以使用以下命令查询所有项目：
+```
+GET http://jsreport-host/odata/data
+```
+样本数据项通常通过其短标识符链接到报告模板。在这种情况下，带有报告的模板结构在json中看起来如下：
+```
+  template : {
+      content: "foo",
+      data: {
+          shortid: "sd543fds"          
+      }
+  }
+```
+还可以将内联数据放入模板中，然后在json中如下所示：
+```
+  template : {
+      content: "foo"
+  },
+  data: {
+    price: 10,
+    amount: 5,
+    total: 50
+  }
+```
+
+### 4.3 Scripts<a name='scripts'></a>    [返回目录](#toc)
+运行自定义JavaScript来修改报告输入/输出或发送报告
+
+#### 基本
+在脚本中定义全局函数beforeRender 或（和）afterRender并使用参数req并res满足您的需求。脚本函数期望参数为req, res, done或req, res。
+```
+async function beforeRender(req, res) {
+  // merge in some values for later use in engine
+  // and preserve other values which are already in
+  req.data = Object.assign({}, req.data, {foo: "foo"})
+  req.data.computedValue = await someAsyncComputation()
+}
+```
+或
+```
+function beforeRender(req, res, done) {
+  // merge in some values for later use in engine
+  // and preserve other values which are already in
+  req.data = Object.assign({}, req.data, {foo: "foo"})
+  done()
+}
+```
+
+#### 使用外部模块
+可以node.js方式通过require使用外部模块，但是首先需要在配置中启用它们。
+```
+{
+  "extensions": {
+    "scripts": {
+      "allowedModules": ["request"]
+    }
+  }
+}
+```
+或者，可以使用extensions.scripts.allowedModules="\*"或使用config 启用所有模块allowLocalFilesAccess=true
+
+下面的示例使用流行的request模块进行Rest调用，并使用sendgrid服务通过电子邮件发送输出服务。
+```
+//load some data from the remote API
+function beforeRender(req, res, done) {
+    require('request')({
+      url:"http://service.url",
+      json:true
+    }, function(err, res, body){
+        req.data = Object.assign({}, req.data, body);
+        done();
+    });
+}
+
+//send the pdf report by mail
+function afterRender(req, res, done) {
+  var SendGrid = require('sendgrid');
+  var sendgrid = new SendGrid('username', 'password');
+
+  sendgrid.send({ to: '',  from: '', subject: '',
+          html: 'This is your report',
+          files: [ {filename: 'Report.pdf', content: new Buffer(res.content) }]
+  }, function(success, message) {          
+          done(success);
+  });
+}
+```
+
+#### request, response
+* req.template-修改报告模板，主要是content和helpers属性
+* req.data -用于修改报告输入数据的json对象
+* req.context.http -包含有关输入http标头，查询参数等信息的对象。
+* res.content -带输出报告的缓冲区
+* res.meta.headers -输出标题
+
+#### 多个脚本
+可以将多个脚本关联到报告模板。然后按照jsreport studio中指定的顺序依次执行脚本。在req和res参数是否正确通过脚本链传递。这意味着可以使用例如req.data在脚本之间传递信息。
+
+#### 全局脚本
+可以通过添加flag来设置为每个模板运行的脚本isGlobal。例如，可以在jsreport studio脚本的属性中完成此操作。全局脚本对于执行常见任务（例如向模板添加常见帮助程序或设置）很有用。
+
+#### 环境变量和配置
+可以使用node.js 处理模块获取环境变量。
+```
+const process = require('process')
+function beforeRender(req, res) {
+   const myEnv = process.env.MY_ENV
+}
+```
+如果愿意，还可以读取配置文件。
+```
+const path = require('path')  
+const promisify= require('util').promisify
+const readFileAsync = promisify(require('fs').readFile)
+
+async function beforeRender(req, res)  {  
+    const configPath = path.join(__appDirectory,  'myConfig.json')
+    const config = (await readFileAsync(configPath)).toString()
+    console.log(config)
+}
+```
+
+#### 子模板和标题
+一些配方（所谓配方是指转换程序与格式的组合，例如phantom-pdf或chrome-pdf）正在调用整个页面、页眉和页脚的渲染过程。这将导致多次调用自定义脚本-用于主页，页眉和页脚。确定来自页眉或页脚的使用req.context.isChildRequest属性。
+```
+function afterRender(req, res) {
+    //filter out script execution for chrome header
+    if (req.context.isChildRequest) {
+      return
+    }
+
+    //your script code
+}
+```
+### 从脚本渲染另一个模板
+脚本可以调用另一个模板的呈现。为此，需要require特殊的模块jsreport-proxy并render在其上调用函数。
+```
+const jsreport = require('jsreport-proxy')
+
+async function beforeRender(req, res) {
+  console.log('starting rendering from script')
+  const result = await jsreport.render({ template: { shortid: 'xxxxxx' } })  
+  console.log('finished rendering with ' + result.content.toString())
+}
+```
+
+#### 从脚本查询实体
+例如，脚本可以查询jsreport存储并使用config加载Asset。
+```
+const jsreport = require('jsreport-proxy')
+async function beforeRender(req, res) {
+  const assets = await jsreport.documentStore.collection('assets').find({name: 'myConfig'})
+  const config = JSON.parse(assets[0].content.toString())
+  req.data.config = config
+}
+```
+
+#### 日志
+console调用会被传播到Studio调试调用，也传播到标准jsreport日志。
+```
+function beforeRender(req, res) {
+  console.log('i\'m generating logs with debug level')
+  console.warn('i\'m generating logs with warn level')
+  console.error('i\'m generating logs with error level')  
+}
+```
+
+#### 配置
+将scripts节点添加到标准配置文件：
+```
+"extensions": {
+  "scripts": {
+    "timeout": 30000,
+    "allowedModules": "*"  
+  }
+}
+```
+#### API
+可以使用标准的OData API来管理和查询脚本实体。例如，可以使用以下命令查询所有脚本
+```
+GET http：//jsreport-host/odata/scripts
+```
+自定义脚本使用其缩写或名称物理链接到存储的报告模板。在这种情况下，API调用无需执行任何操作，因为脚本是自动应用的。
+```
+POST: { template: { name: 'My Template with script' }, data: { } }
+```
+如果要呈现匿名模板，则可以通过脚本名称或短标识符来识别脚本
+```
+POST: {
+  template : {
+      content: "foo",
+      scripts: [{
+          shortid: "sd543fds"          
+      }, {
+          name: "My Script"  
+      }]      
+  }
+}
+```
+最后一个选项是直接指定脚本内容
+```
+POST: {
+  template : {
+      content: "foo",
+      scripts: [{
+          content: "function beforeRender(req, res, done) { req.template.content='hello'; done(); }"
+      }]      
+  }
+}
+```
+
+#### 使用脚本加载数据
+有些人喜欢将数据从客户端推送到jsreport中，有些人喜欢使用scripts扩展名主动获取它们。在将数据推送到jsreport更为直接的地方，使用scripts可以提供更好的体系结构和完全分离的报告服务器，其中报告本身负责定义输入以及获取输入。这个选择由你。
 
 
 ## 许可<a name='license'></a>    [返回目录](#toc)
