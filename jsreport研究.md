@@ -807,8 +807,426 @@ POST: {
 ```
 
 #### 使用脚本加载数据
-有些人喜欢将数据从客户端推送到jsreport中，有些人喜欢使用scripts扩展名主动获取它们。在将数据推送到jsreport更为直接的地方，使用scripts可以提供更好的体系结构和完全分离的报告服务器，其中报告本身负责定义输入以及获取输入。这个选择由你。
+有些人喜欢将数据从客户端推送到jsreport中，有些人喜欢使用scripts扩展名主动获取它们。在将数据推送到jsreport更为直接的地方，使用scripts可以提供更好的体系结构和完全分离的报告服务器，其中报告本身负责定义输入以及获取输入。这个由使用者选择。
 
+### 4.4 Assets（资产）<a name='assets'></a>    [返回目录](#toc)
+嵌入静态资产，例如样式，字体或html
+
+#### 创建资产
+可以使用jsreport studio创建资产。最常见的方法是仅上传css之类的文件。第二个是使用jsreport编辑器创建一个空资产并编辑其内容。第三种选择是创建资产作为到现有文件的链接。这样的链接可以是指向jsreport的文件夹的绝对路径或相对路径。
+
+#### 嵌入资产
+嵌入资产的语法如下：
+```
+{#asset [nameOrPath]}
+```
+nameOrPath可以是唯一的资产名称，也可以是绝对或相对路径。
+
+例子：
+```
+{#asset mainTheme.css}
+{#asset /shared/chart.js}
+{#asset ../js/chart.js}
+```
+然后，这样的字符串将在输出中替换为先前上载或链接的资产的内容。由于没有其他转换在运行，因此它比提取子模板运行快。
+
+资产可以嵌入模板的内容，助手或自定义脚本中。这样可以实现诸如添加常用帮助功能或将配置文件添加到脚本的方案。
+
+资产提取是递归的，这意味着可以创建资产层次结构。这使用户可以将样式的链接分组为一个资产。
+
+资产提取在渲染期间运行两次。首先，在jsreport知道模板之后，并且在执行模板引擎之后。这意味着您可以动态构造资产名称。例如，以下将与jsreport handlebars引擎一起使用。
+```
+{#asset {{giveMeAssetName}}}
+```
+
+#### 全局共享助手
+模板引擎助手需要经常在多个模板之间共享。使用资产可以实现此目的，因为可以使用Studio将每个资产标记为全局共享的帮助程序。然后，此类资产会自动嵌入到所有模板帮助器中。
+
+#### 编码选项
+资产不必是必需的文本文件。它也可以是图像或字体之类的二进制文件。在这种情况下，可以使用@encoding
+```
+<img src='{#asset logo.png @encoding=dataURI}'/>
+```
+支持的编码值：
+
+* utf8 -未指定时使用的默认编码，将资产作为原始字符串嵌入utf8字符集中
+
+* string-嵌入资产作为UTF8字符集原始字符串但逸出一些字符（"，'，\n对于一个JavaScript上下文内使用，等等）。当您要将资产内容作为javascript变量ex的一部分使用时，请使用以下编码：var data = "{#asset vardata.txt @encoding=string}"
+
+* link-将资产嵌入作为对链接（http://<host>:<port>/assets/content/<asset name>）的引用。有关深入使用和警告的信息，请参见将资产嵌入作为链接
+
+* base64-将资产嵌入为内容的base64表示形式
+
+* dataURI-使用资产URI将资产作为其内容的base64表示形式嵌入。嵌入图像和字体时很有用。
+
+每种编码都有不同的用例，因此请确保根据您的情况使用正确的编码。
+
+#### 外部文件访问
+尽管设计上提供授权和用户界面，但不需要通过jsreport studio上载或链接资产。也可以assets.searchOnDiskIfNotFoundInStore=true以相同的方式在配置和简单的嵌入文件中启用选项，而无需接触jsreport studio。
+
+#### 将资产嵌入为链接
+资产也可以称为链接。通常在html配方中执行效果更好，因为浏览器可以缓存资产或并行请求资产。
+```
+<script src="{#asset jquery.js @encoding=link}"></script>
+```
+但是，此方法有几个陷阱，只有在确实有意义时才应使用它。
+
+第一个问题是，资产链接需要对chrome（或基于浏览器的外部配方，例如phantomjs）是可公开访问的。可以通过config选择：
+```
+{
+   "extensions": {
+     "assets": {
+       "publicAccessEnabled": true
+     }
+   }
+}
+```
+第二个问题是资产链接是基于jsreport服务器url的，而且这并不总是很容易自动确定。有以下三种情况：
+
+1. 配置包含一个值，assets.rootUrlForLinks然后始终将其用作基础
+2. 传入的HTTP呈现请求用于构造根URL
+3. 没有传入请求（以不同的方式触发渲染），并且rootUrlForLinks未设置。在这种情况下，localhost:[PORT]用作基础
+
+#### 配置
+将assets节点添加到标准配置文件：
+```
+extensions: {
+  assets: {
+    // wildcard pattern for accessible linked or external files
+    allowedFiles: "static/**.css",
+    // enables access to files not stored as linked assets in jsreport store    
+    searchOnDiskIfNotFoundInStore: false,
+    // root url used when embedding assets as links {#asset foo.js @encoding=link}
+    rootUrlForLinks: "http://mydomain.com",
+    // make all assets accessible to anonymous requests
+    publicAccessEnabled: true
+  }
+}
+```
+
+#### API
+可以使用标准的OData API来管理和查询资产实体。例如，您可以使用查询所有资产
+```
+GET http://jsreport-host/odata/assets
+```
+
+### 4.5 Child Template<a name='child_template'></a>    [返回目录](#toc)
+将报告模板分解为多个可重用的子模板
+
+#### 基本
+复杂的报告可能会越来越大，并且包含许多单独的部分。从逻辑上讲，每个部分都需要自己的特定帮助者，设计输入数据甚至是自定义脚本来远程获取它们。在这种情况下，将复杂的报告模板拆分为多个子模板是有意义的，这些子模板可以单独开发，也可以重用。这种扩展涵盖了这种用例。
+
+但是，如果只有静态内容（例如一组样式，html布局等），则最佳选择（简单且性能更高）是使用资产扩展来处理这种内容。
+
+#### 运行机制
+呈现报告时，jsreport搜索特殊标记，{#child [nameOrPath]}并将其内容替换为引用模板的输出。它调用子模板的整个渲染过程，并在{#child [nameOrPath]}特殊标记以前所在的位置包含该输出。可以将其视为字符串替换。
+
+nameOrPath可以是唯一的模板名称，也可以是绝对或相对路径。例子：
+```
+{#child departmentsTemplate}
+{#child /contosoCompany/templates/departments}
+{#child ../shared/departments}
+```
+
+#### 关于PDF的警告
+由于子模板执行整个渲染操作，因此尝试在生成PDF的父模板内渲染生成PDF的子模板会给父PDF填充垃圾（子模板的渲染PDF）。
+
+在这种情况下，当在父pdf中渲染使用chrome-pdf配方的子模板时，将子模板的recipe设为html。
+
+#### 设置子模板参数
+根请求输入数据级联传递到子模板，但是也可以通过其声明将其他数据传递给子模板
+```
+{#child myChildTemplate @data.paramA=foo}
+```
+或者，可以覆盖现有的子模板属性，例如用于呈现子模板的配方。
+```
+{#child myChildTemplate @template.recipe=html @options.language=sp}
+```
+注意，模板引擎的this上下文不会流向子模板渲染。总是在子模板中获得整个父数据集上下文。
+
+可以使用特殊语法$=和帮助器将复杂对象作为参数传递childTemplateSerializeData。
+```
+{#child myChild @data.foo$={{{childTemplateSerializeData foo}}} }
+```
+
+#### 配置
+将child-templates节点添加到标准配置文件：
+```
+extensions: {
+  "child-templates": {
+    // controls how many child templates rendering can happen in parallel, defaults to 2
+    "parallelLimit": 5
+  }
+}
+```
+
+### 4.6 Report<a name='report'></a>    [返回目录](#toc)
+保留报告呈现输出以供以后访问
+
+#### 基本
+每次调用jsreport API呈现报告时，将获得包含报告内容的流。当想直接向用户显示报告或想要将结果存储在数据存储中以备后用时，这很有用。但是有时只是不想在生成报表时就使用它，也不想自己存储它。在这种情况下，可以使用Reportsextension并让jsreport存储报告。
+
+报表扩展使用Blob存储抽象来实现报表Blob持久性。默认情况下，这会将报告存储到文件系统。如果要将报告存储到其他目的地，请查阅文档。
+
+#### API
+默认情况下，报告扩展名不用于所有渲染请求，需要为每个请求分别指定它。
+
+要使用reports扩展，需要通过以下方式扩展渲染请求：
+```
+POST: https：// jsreport-host / api / report BODY:
+
+   {
+      "template": { "shortid" : "g1PyBkARK" },
+      "data" : { ... },
+      "options": {
+          "reports": { "save": true }
+      }
+   }
+ ```
+这将创建一个Report可以在jsreport studio以及OData API中使用的实体。此外，它将Permanent-Link在响应中添加自定义头信息，以后可以使用该标头实际下载报告内容。
+
+默认情况下，存储的报表实体名称是从模板名称继承的。但是，可以通过传入{ "options": { "reportName": "yourCustomName" }请求正文来对其进行自定义。
+
+默认情况下，存储的文件/blob的名称是从实体唯一_id继承的。可以使用{ "options": { "reports": { "save": true, "blobName": "myfilename" } }
+
+#### 异步
+发送呈现请求options.reports.save = true将指示扩展程序保存报告并向Permanent-Link响应中添加标头，但是呈现仍是同步的，并且在过程完成后会收到响应。如果要异步启动渲染过程并立即收到响应，则应设置options.reports.async = true。
+```
+POST: https：// jsreport-host / api / report BODY:
+
+   {
+      "template": { "shortid" : "g1PyBkARK" },
+      "data" : { ... },
+      "options": {
+          "reports": { "async": true }
+      }
+   }
+ ```
+在这种情况下，会收到带有Location标题的响应，该标题包含指向渲染状态页面的url。它会像http://jsreport-host/reports/id/status。然后，您可以ping状态页面以检查渲染是否完成。在这种情况下，响应状态为201，并且位置标头将包含存储的报告的地址。
+
+#### 清理
+默认情况下，永久保存通过异步调用存储的报告。可以更改此设置并启用自动清除旧报告。这可以通过配置来完成。
+```
+{ 
+  "extensions": { 
+    "reports": {
+      // how often the cleanup runs
+      "cleanInterval": "5m",
+      // how much old reports should be deleted
+      "cleanTreshold": "1d"
+    }
+  }
+}
+```
+请注意，自动清除逻辑还会删除通过调度计划（Schedule）扩展产生的报告。
+
+#### 数据
+可以使用标准的OData API来管理和查询报表实体。例如，可以使用以下命令查询所有报告：
+```
+GET http://jsreport-host/odata/reports
+```
+
+### 4.7 Scheculing<a name='scheduling'></a>    [返回目录](#toc)
+安排重复发生的后台作业渲染特定的报告模板
+
+#### 基本
+每个报告呈现时间计划均由报告模板和标识时间发生的CRON表达式指定。要创建渲染时间表，需要Schedule通过jsreport studio或API 创建并启用实体。当Schedule启用了，检验NextRun属性，每次渲染完成后，也可以从工作室或Task API实体下载输出报告。
+
+Scheduling需要并且在很大程度上依赖脚本和报告扩展。报告用于存储渲染输出，脚本通常用于获取输入数据并发送结果。
+
+scheduling扩展的常见用例可以是每天发送摘要报告。schedule报表模板将在其中定义带有汇总表和图表的文档。脚本将在渲染之前获取输入数据，然后通过邮件发送报告或将结果上传到外部服务。请注意，脚本可以在property中获得有关当前计划的更多信息 req.options.scheduling.schedule。
+
+#### CRON表达
+CRON表达式是用于指定时间发生的UNIX标准。它是一个由5或6个段组成的字符串。
+
+1. 秒：0-59
+2. 分钟：0-59
+3. 小时：0-23
+4. 每月的日期：1-31
+5. 月：1-12
+6. 星期几：0-7
+每个细分都标识特定的单位。在每个段中，还可以使用通配符\*，间隔（1-5）和步长（*/5）。
+
+一些例子：
+```
+*/10 * * * * * -每10秒运行一次
+00 30 11 * * 1-5 -每个工作日的11:30:00运行
+```
+
+CRON参考http://crontab.org/
+
+#### 配置
+将scheduling节点添加到标准配置文件。默认值如下。
+```
+"extensions": {
+  "scheduling": {
+    //how often in ms jsreport checks scheduled jobs
+    "interval": 5000,
+    //how many jobs can run in parallel
+    "maxParallelJobs": 5    
+  }
+}
+```
+
+### 4.8 Authentication<a name='authentication'></a>    [返回目录](#toc)
+将登录屏幕添加到jsreport和用户管理表单
+
+#### 基本
+启用authentication扩展将在jsreport studio中添加一个登录屏幕并验证所有传入请求。浏览器身份验证基于cookie，并且使用基本身份验证或针对已配置的授权服务器验证的承载身份验证来验证API调用。
+
+Authentication配置将一个添加用户管理员，负责管理其他用户的系统中。该用户可以创建用户，删除用户或更改其密码。所有其他个人用户无权更改任何其他用户。
+
+#### 基本认证
+##### 配置
+要启用身份验证，请在配置中添加以下json 。
+```
+"extensions": {
+    "authentication" : {
+        "cookieSession": {
+            "secret": "dasd321as56d1sd5s61vdv32",
+                    "cookie": { <custom cookie options here> }       
+        },
+        "admin": {
+            "username" : "admin",
+            "password": "password"
+        }
+    }
+}
+```
+可以根据需要更改管理员用户名或密码。
+
+可在此处设置要设置的自定义Cookie选项的列表，例如，您可以设置{ "cookie": { "secure": true } }为指示将仅通过HTTPS发送auth Cookie，这是一种很好的安全做法，但它要求您的服务器首先在https下运行。
+```
+"extensions": {
+    "authentication" : {
+        "cookieSession": {
+            "secret": "dasd321as56d1sd5s61vdv32",
+            "cookie": { "secure": true }       
+        },
+        "admin": {
+            "username" : "admin",
+            "password": "password"
+        }
+    }
+}
+```
+##### API
+启用此扩展名时，需要向每个请求添加头信息。
+```
+Authorization: Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==
+```
+哈希值基于用户名和密码： base64(username:password)
+
+可以使用标准的OData API来管理和查询用户实体。例如，您可以使用以下命令查询所有用户：
+```
+GET http://jsreport-host/odata/users
+```
+
+#### 使用授权服务器进行基于令牌的身份验证
+该功能处于预览模式。
+
+如果要将jsreport API中的所有身份验证委托给支持基于令牌的身份验证（承载身份验证模式）的授权服务器，则需要使用这些authorizationServer选项，很可能仅在您希望将jsreport公开为具有Single Sign On支持的产品。
+
+将jsreport配置为使用授权服务器时，身份验证流程如下所示：
+
+* 首先，以某种方式将需要获取令牌，颁发令牌是授权服务器的责任，并且将需要从一个应用程序中请求令牌，获取令牌的必要步骤和详细信息将取决于授权服务器的实现，将需要令牌，以便以后能够调用jsreport API
+* jsreport将期望从在任何受保护的API调用的Authorization头信息中获取令牌，该令牌必须使用Bearer授权模式发送，这意味着对jsreport API的所有请求都必须使用头信息：Authorization: Bearer <your token here>
+* 有了令牌后，jsreport会将令牌（token=<value of your token>，token_type_hint=access_token字段）以及任何其他已配置的数据（authorizationServer.tokenValidation.hint）或凭据（authorizationServer.tokenValidation.auth）发送到已配置的端点（authorizationServer.tokenValidation.endpoint）
+* 授权服务器必须返回一个json响应，其中包含描述令牌是否有效的字段（authorizationServer.tokenValidation.activeField），以及与之相关联用户（authorizationServer.tokenValidation.usernameField）
+* jsreport将检查从授权服务器返回的令牌的信息（authorizationServer.tokenValidation.activeField），如果令牌有效，则活动字段必须为true，用户authorizationServer.tokenValidation.usernameField名字段必须为有效的jsreport用户，如果配置了范围验证authorizationServer.tokenValidation.scope，还将检查令牌是否具有有效authorizationServer.tokenValidation.scope.valid范围，然后验证用户身份
+
+这些步骤中的许多步骤都是基于令牌自省方法，在基于OAuth2或的授权服务器中很常见OpenID Connect，并且如果授权服务器基于任何其他类型的实现，则描述的步骤很容易实现，因此可以实现与大多数授权服务器的兼容性。
+
+要真正实现jsreport+授权服务器，请查看[示例](https://jsreport.net/learn/configuration)
+
+##### 配置
+要启用身份验证，请将以下json添加到配置文件中。
+```
+"extensions": {
+    "authentication" : {
+        "cookieSession": {
+            "secret": "dasd321as56d1sd5s61vdv32"        
+        },
+        "admin": {
+            "username" : "admin",
+            "password": "password"
+        },
+        // use the "authorizationServer" options when you plan to protect API calls
+        // with token based authentication against an authorization server,
+        // this means that all protected jsreport API calls will be validated with
+        // the configured authorization server, giving you the chance to expose
+        // jsreport as a product with Single Sign On support.
+        // see "Token based authentication using an authorization server" section of this document
+        // for more details and a link to a sample with real implementation.
+        "authorizationServer": {
+            "tokenValidation": {
+                // URL to the authorization server endpoint (required)
+                "endpoint": "http://localhost:9800/token/introspection",
+                // time in milliseconds that jsreport will wait before closing the request
+                // sent to the authorization server. (optional, defaults to 6000)
+                "timeout": 6000,
+                // by default jsreport will send data to the authorization server
+                // using "application/x-www-form-urlencoded" content type,
+                // setting this option to true will make jsreport to send the data using
+                // "application/json" content type. (optional, defaults to false)
+                "sendAsJSON": false,
+                // use this option if you would like to pass custom data to
+                // the authorization server. you can configure one or multiple values
+                // for example using "hint": "custom value" will send a "hint" field
+                // with value "custom value" to the authorization server,
+                // to use another field name you can use "hint": { "name": "reportService", value: true } to send a "reportService" field
+                // and use "hint": [{ "name": "reportService", value: true }, { "name": "anotherField", value: true }] to send multiple fields
+                // (optional, defaults to null)
+                "hint": null,
+                // name of the field that jsreport will look at in the response from authorization server to
+                // use as the jsreport username associated with the token. (optional, defaults to "username")
+                "usernameField": "username",
+                // name of the field that jsreport will look at in the response from authorization server to
+                // determine if the token is valid or not. (optional, defaults to "active")
+                "activeField": "active",
+                // options to use if you want that jsreport checks for valid scopes in the token
+                // optional, defaults to null
+                "scope": {
+                    // name of the field that jsreport will look at in the response from authorization server to
+                    // determine the scope/scopes of the token. (optional, defaults to "scope")
+                    "field": "scope",
+                    // list of valid scopes that the token needs to have in order to be considered valid, the token must have at least one scope that match with some item in the list in order to be considered valid
+                    "valid": ["myscope"]
+                },
+                // options to use if the authorization server is not public and requires authentication,
+                // if your authorization server is public just pass "auth": false
+                // (required)
+                "auth": {
+                    // defines which auth schema to use while sending credentials to the authorization server
+                    // supported values are "basic" and "bearer"
+                    "type": "basic",
+                    // credentials to use when using the "basic" type
+                    "basic": {
+                        "clientId": "test",
+                        "clientSecret": "xxxx"
+                    },
+                    // credentials to use when using the "bearer" type
+                    "bearer": "dasdasddw23fsdfsdfr56hvFVdf3"
+                }
+            }
+        }
+    }
+}
+```
+
+### 4.9 Authorization<a name='authorization'></a>    [返回目录](#toc)
+管理和委托jsreport对象的用户权限。需要启用身份验证
+
+#### 基本
+jsreport authorization扩展实现权限规则评估和委派。默认情况下，以前由身份验证扩展创建的每个用户仅被授权管理自己创建的对象。如果用户想与其他用户共享对象，则需要在权限表中明确设置该对象。jsreport当前只能区分read和edit权限，其中edit权限代表所有操作，包括权限委派。
+
+嵌套在文件夹内的所有实体都将从父文件夹继承权限。递归地向下遍历多个级别的文件夹。换句话说，可以将一些权限填充到文件夹中，内部的所有实体也将获得此权限。此外，如果用户具有对特定实体的权限，则他或她将获得对树上所有父文件夹的只读权限。
+
+#### API
+Authorization扩展添加到每个jsreport对象readPermissions和editPermissions属性。这些属性包含可以从odata API轻松更改的用户ID列表。
+
+#### 局限性
+目前仅为管理员用户启用了计划和版本控制扩展。
 
 ## 许可<a name='license'></a>    [返回目录](#toc)
 
