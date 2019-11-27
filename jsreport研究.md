@@ -67,6 +67,29 @@
     4.12 [Tags](#tag)
     
     4.13 [CLI](#cli)
+
+5. [转换引擎（算法）](#recipes)
+    
+    5.1 [HTML](#html_recipe)
+    
+    5.2 [Chrome PDF](#chrome_pdf)
+    
+    5.3 [Chrome Image](#chrome_image)
+    
+    5.4 [Xlsx](#xlsx)
+    
+    5.5 [Html to Xlsx](#htmo_to_xlsx)
+    
+    5.6 [Docx](#docx)
+    
+    5.7 [Html embedded in docx](#html_in_docx)
+    
+    5.8 [docxtemplater](#docxtemplater)
+    
+    5.9 [Phantom pdf](#phantom_pdf)
+    
+    5.10 [Phantom Image](#phantom_image)
+    
     
 [许可](#license)
 
@@ -1582,7 +1605,7 @@ if (process.env.JSREPORT_CLI) {
 }
 ```
 
-## 5. 转换引擎（算法）
+## 5. 转换引擎（算法）<a name='recipes'></a>    [返回目录](#toc)
 转换引擎（算法）是jsreport使用的算法，用于将模板引擎的输出转换为所需的格式。每个报告模板都需要从jsreport提供的许多模板中准确指定一个配方。例如，指定 chrome-pdf算法将使用html到pdf转换创建pdf报告。另一方面，使用 html-to-xlsx可以生成excel文件。
 
 jsreport通常支持特定输出类型的各种配方。这是因为每种转换引擎都有其优点和缺点。建议比较多个转换算法，并确定最适合特定情况的转换算法。可以在https://jsreport.net/learn/pdf-recipes的专用文章中找到有用的pdf转换算法比较。
@@ -1773,7 +1796,7 @@ chrome/puppeteer默认不会在受限环境（例如docker）中运行，并且�
 }
 ```
 
-###  5.3 Chrome Image<a name='chrome_pdf'></a>    [返回目录](#toc)
+###  5.3 Chrome Image<a name='chrome_image'></a>    [返回目录](#toc)
 #### 基础
 chrome-image转换引擎能够将html转换为图像。它就像chrome-pdf一样工作，只是某些选项有所不同。
 
@@ -2305,7 +2328,7 @@ body {
 * phantom.portRightBoundary（number）-为phantomjs服务器设置特定的端口范围
 * phantom.defaultPhantomjsVersion（string）-设置要使用的默认phantomjs版本，请注意，如果要设置默认值以外的其他值，则必须手动安装所需的phantomjs版本（使用类似phantomjs-prebuilt或的软件包phantomjs-exact-2-1-1）。默认值：1.9.8
 
-###  5.9 Phantom Image<a name='phantom_image'></a>    [返回目录](#toc)
+###  5.10 Phantom Image<a name='phantom_image'></a>    [返回目录](#toc)
 使用phantomjs从html渲染图像
 
 #### 安装
