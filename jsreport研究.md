@@ -609,7 +609,7 @@ Headers：内容类型：application / json
 ### 4.2 Inline Data<a name='inline_data'></a>    [返回目录](#toc)
 在模板开发过程中使用样本测试数据
 
-#### 基本
+#### 基础
 报告生成过程的输入是报告模板和一些json输入数据。将在运行时将这些数据提供给jsreport API，但是每次想查看报告的外观时调用jsreport API并不是很有效。jsreport带有Data扩展名。
 
 Data 扩展允许直接在jsreport studio中使用JSON语法静态定义输入数据，并轻松测试模板。
@@ -643,7 +643,7 @@ GET http://jsreport-host/odata/data
 ### 4.3 Scripts<a name='scripts'></a>    [返回目录](#toc)
 运行自定义JavaScript来修改报告输入/输出或发送报告
 
-#### 基本
+#### 基础
 在脚本中定义全局函数beforeRender 或（和）afterRender并使用参数req并res满足您的需求。脚本函数期望参数为req, res, done或req, res。
 ```
 async function beforeRender(req, res) {
@@ -933,7 +933,7 @@ GET http://jsreport-host/odata/assets
 ### 4.5 Child Template<a name='child_template'></a>    [返回目录](#toc)
 将报告模板分解为多个可重用的子模板
 
-#### 基本
+#### 基础
 复杂的报告可能会越来越大，并且包含许多单独的部分。从逻辑上讲，每个部分都需要自己的特定帮助者，设计输入数据甚至是自定义脚本来远程获取它们。在这种情况下，将复杂的报告模板拆分为多个子模板是有意义的，这些子模板可以单独开发，也可以重用。这种扩展涵盖了这种用例。
 
 但是，如果只有静态内容（例如一组样式，html布局等），则最佳选择（简单且性能更高）是使用资产扩展来处理这种内容。
@@ -983,7 +983,7 @@ extensions: {
 ### 4.6 Report<a name='report'></a>    [返回目录](#toc)
 保留报告呈现输出以供以后访问
 
-#### 基本
+#### 基础
 每次调用jsreport API呈现报告时，将获得包含报告内容的流。当想直接向用户显示报告或想要将结果存储在数据存储中以备后用时，这很有用。但是有时只是不想在生成报表时就使用它，也不想自己存储它。在这种情况下，可以使用Reportsextension并让jsreport存储报告。
 
 报表扩展使用Blob存储抽象来实现报表Blob持久性。默认情况下，这会将报告存储到文件系统。如果要将报告存储到其他目的地，请查阅文档。
@@ -1049,7 +1049,7 @@ GET http://jsreport-host/odata/reports
 ### 4.7 Scheculing<a name='scheduling'></a>    [返回目录](#toc)
 安排重复发生的后台作业渲染特定的报告模板
 
-#### 基本
+#### 基础
 每个报告呈现时间计划均由报告模板和标识时间发生的CRON表达式指定。要创建渲染时间表，需要Schedule通过jsreport studio或API 创建并启用实体。当Schedule启用了，检验NextRun属性，每次渲染完成后，也可以从工作室或Task API实体下载输出报告。
 
 Scheduling需要并且在很大程度上依赖脚本和报告扩展。报告用于存储渲染输出，脚本通常用于获取输入数据并发送结果。
@@ -1091,7 +1091,7 @@ CRON参考http://crontab.org/
 ### 4.8 Authentication<a name='authentication'></a>    [返回目录](#toc)
 将登录屏幕添加到jsreport和用户管理表单
 
-#### 基本
+#### 基础
 启用authentication扩展将在jsreport studio中添加一个登录屏幕并验证所有传入请求。浏览器身份验证基于cookie，并且使用基本身份验证或针对已配置的授权服务器验证的承载身份验证来验证API调用。
 
 Authentication配置将一个添加用户管理员，负责管理其他用户的系统中。该用户可以创建用户，删除用户或更改其密码。所有其他个人用户无权更改任何其他用户。
@@ -1237,7 +1237,7 @@ GET http://jsreport-host/odata/users
 ### 4.9 Authorization<a name='authorization'></a>    [返回目录](#toc)
 管理和委托jsreport对象的用户权限。需要启用身份验证
 
-#### 基本
+#### 基础
 jsreport authorization扩展实现权限规则评估和委派。默认情况下，以前由身份验证扩展创建的每个用户仅被授权管理自己创建的对象。如果用户想与其他用户共享对象，则需要在权限表中明确设置该对象。jsreport当前只能区分read和edit权限，其中edit权限代表所有操作，包括权限委派。
 
 嵌套在文件夹内的所有实体都将从父文件夹继承权限。递归地向下遍历多个级别的文件夹。换句话说，可以将一些权限填充到文件夹中，内部的所有实体也将获得此权限。此外，如果用户具有对特定实体的权限，则他或她将获得对树上所有父文件夹的只读权限。
@@ -1274,7 +1274,7 @@ POST: api/report
 ### 4.11 Resources<a name='resource'></a>    [返回目录](#toc)
 本地化模板或将任何静态JSON附加到呈现过程
 
-#### 基本
+#### 基础
 通过Resources扩展可以将多个JSON数据对象附加到报告模板上，以后使用模板引擎或在自定义脚本中方便地访问它们。这对于将常规配置添加到模板或主要本地化模板很有用。
 
 #### 本土化
@@ -1378,7 +1378,7 @@ GET http://jsreport-host/odata/templates('aaaa')
 ### 4.12 Tags<a name='tag'></a>    [返回目录](#toc)
 用标签组织jsreport对象
 
-#### 基本
+#### 基础
 启用tags扩展将为jsreport添加组织功能，从而启用带有标签的jsreport对象的组织，过滤和显示。
 
 #### 创建和使用标签
@@ -1402,7 +1402,7 @@ GET http://jsreport-host/odata/tags
 ```
 
 ### 4.12 Version Control<a name='tag'></a>    [返回目录](#toc)
-#### 基本
+#### 基础
 jsreport扩展添加了对版本控制实体的支持，并为常见命令（如commit，diff，revert或history）提供API以及Studio UI。只需安装扩展程序，就可以在Studio中看到新的用户界面。
 
 #### Git
@@ -1425,7 +1425,7 @@ npm install jsreport-version-control-git
 ### 4.13 CLI<a name='cli'></a>    [返回目录](#toc)
 jsreport的命令行界面
 
-#### 基本
+#### 基础
 cli扩展程序提供命令行界面，该界面可以执行一些称为命令的任务。这些命令主要可以从命令行快速启动服务器或调用报表呈现，但是所提供的功能列表cli要长得多。
 
 cli也直接集成到以单个文件可执行形式发布的jsreport中，可参考https://jsreport.net/learn/single-file-executable。
@@ -1579,6 +1579,197 @@ if (process.env.JSREPORT_CLI) {
    console.error(e.stack)
    process.exit(1)
  })
+}
+```
+
+## 5. 转换引擎（算法）
+转换引擎（算法）是jsreport使用的算法，用于将模板引擎的输出转换为所需的格式。每个报告模板都需要从jsreport提供的许多模板中准确指定一个配方。例如，指定 chrome-pdf算法将使用html到pdf转换创建pdf报告。另一方面，使用 html-to-xlsx可以生成excel文件。
+
+jsreport通常支持特定输出类型的各种配方。这是因为每种转换引擎都有其优点和缺点。建议比较多个转换算法，并确定最适合特定情况的转换算法。可以在https://jsreport.net/learn/pdf-recipes的专用文章中找到有用的pdf转换算法比较。
+
+###  5.1 HTML<a name='html_recipe'></a>    [返回目录](#toc)
+Html是最基本的jsreport转换算法。它只是评估javascript模板引擎并输出html报告文件。它不仅在仅打印html时有用，而且在使用子模板并将多个模板组装在一起时也很有用。
+
+###  5.2 Chrome PDF<a name='chrome_pdf'></a>    [返回目录](#toc)
+#### 基础
+Chrome-pdf转换引擎是使用headless chrome将html内容打印到pdf文件中。
+
+#### 选项
+这些设置反映了headless chrome  API的设置，可参考https://github.com/GoogleChrome/puppeteer/blob/master/docs/api.md#pagepdfoptions。
+
+* scale
+* displayHeaderFooter
+* headerTemplate
+* footerTemplate
+* printBackground
+* pageRanges
+* format
+* width
+* height
+* marginTop
+* marginRight
+* marginBottom
+* marginLeft
+* waitForJS
+* waitForNetworkIddle
+
+这些基本设置通常与模板一起存储，但是也可以通过属性template.chrome内的API调用发送这些基本设置。
+
+还可以使用以下方法在页面javascript中动态设置选项：
+```
+<script>
+    ...
+    window.JSREPORT_CHROME_PDF_OPTIONS = {
+        landscape:  true
+    }
+</script>
+```
+
+#### 配置
+使用chrome-pdf标准配置文件中的节点。
+```
+"extensions": {
+  "chrome-pdf": {  
+    "timeout": 30000,
+    "launchOptions": {...}
+  }
+}
+```
+要查找有关launchOptions配置对象中可用内容的更多信息，可以在此处查看https://github.com/GoogleChrome/puppeteer/blob/master/docs/api.md#puppeteerlaunchoptions。
+
+还可以chrome在配置中使用顶级属性，不同之处在于，此配置将与使用chrome的任何其他扩展共享，而上面的配置代码段专门用于chrome-pdf扩展中的选项。
+```
+"chrome": {
+  "timeout": 30000
+}
+``
+
+#### 字体
+使用资产(Assets)扩展，可以轻松地将字体嵌入到PDF报告中。您可以在此处找到有关该方法的教程。
+
+#### 分页符
+CSS包含page-break-before可用于指定html分页符的样式。chrome-pdf也可以使用它，以便在pdf文件中指定分页符。
+```
+<h1>Hello from Page 1</h1>
+<div style='page-break-before: always;'></div>
+<h1>Hello from Page 2</h1>
+```
+还可以使用css属性page-break-inside来例如避免将元素拆分为多个页面。
+
+#### 打印触发器
+可能需要推迟pdf打印，直到处理了一些javascript异步任务。如果是这种情况，请在API中设置chrome.waitForJS=true或利用工作室菜单设置Wait for printing trigger。然后，直到在模板的javascript中进行设置window.JSREPORT_READY_TO_START=true后，打印才会开始。
+```
+...
+<script>
+    // do some calculations or something async
+    setTimeout(function() {
+        window.JSREPORT_READY_TO_START = true; //this will start the pdf printing
+    }, 500);
+    ...
+</script>
+```
+#### 内置页眉和页脚
+系统完整的jsreport模板一样对页眉和页脚进行计算求值。这意味着可以在标题中添加例如子模板引用，然后将其提取出来。还可以使用主模板助手或页眉/页脚中的数据。注意，为了显示页眉/页脚，需要先激活该displayHeaderFooter选项，并在模板中添加一些顶部、底部边距，以便为页面提供一些空间来显示页眉/页脚。
+
+在页眉/页脚模板中，可以使用一些特殊的CSS类使chrome注入一些内容。chrome支持的特殊CSS类如下：
+
+* date ->注入格式化的打印日期
+* title ->注入文件标题的内容
+* url ->注入文件位置
+* pageNumber ->注入当前页码
+* totalPages ->注入总页数
+
+应该注意内置页眉/页脚存在一些问题：
+
+* 图片无法引用链接，需要使用base64数据URI
+* javascript不会被执行
+* 内容存在缩放问题，需要设置字体大小css以使其足够大以使其可见
+* 未打印背景色，使用`-webkit-print-color-adjust: exact`作为解决方法
+
+在大多数情况下，最好使用pdf-utils代替，它的限制较少，并且没有这些问题。
+
+该示例显示了如何使用特殊的CSS类以及解决缩放问题的解决方法。
+```
+<!--header template content-->
+<html>
+  <head>
+    <style>
+      /* defining explicit font-size solves the scaling issue */
+      html, body {
+        font-size: 12px;
+      }
+    </style>
+  </head>
+  <body>
+    <!--
+      defining some elements with the special css classes makes chrome
+      inject content in runtime
+    -->
+    Page&nbsp;<span class="pageNumber"></span>&nbsp;of&nbsp;<span class="totalPages"></span>
+  </body>
+</html>
+```
+
+#### 复杂页眉和页脚
+该PDF-utils的扩展提供先进、更丰富的功能合并的动态内容到chrome pdf输出，如丰富的页眉/页脚、打印页码、水印、合并不同方向的页等，一定要检查https://jsreport.net/learn/pdf-utils的一些例子。
+
+#### CSS媒体类型和引导程序
+Chrome默认使用print在打印pdf时。这会影响CSS框架，例如Bootstrap，通常会为print媒体类型产生不同的结果。在这种情况下，pdf会应用与html不同的样式。您可以修改/从不断变化的媒体类型设置团结这print对screen在模板的Chrome浏览器设置。
+
+#### 重用Chrome实例
+默认情况下，每次渲染模板时，转换引擎都会启动额外的新chrome进程。可以更改此行为，并将配方配置为重用多个chrome实例以提高渲染性能。
+```
+{
+  "extensions": {
+    "chrome-pdf": {
+      "strategy": "chrome-pool",
+      "numberOfWorkers": 3
+    }
+  }
+```
+
+#### 打印现有网页
+也可以通过chrome-pdf转换引擎打印现有网页，而无需在jsreport studio中定义模板。只需发送如下请求：
+```
+{ 
+  "template": { 
+    "recipe": "chrome-pdf",
+    "engine": "none",
+    "chrome": {
+      "url": "https://jsreport.net"
+    }
+  }
+}
+```
+或者，可以创建一个空模板并使用jsreport脚本定义url 。
+
+function beforeRender(req, res) {
+  req.template.chrome = {
+     "url": "https://jsreport.net"
+  }
+}
+```
+
+#### 故障排除
+自封闭的div（<div />）会严重减慢chrome pdf渲染速度，不要使用！
+
+有的用户可能由于源html的错误缩进而遇到了chrome停止响应的问题，通过单击重新格式化的代码可能会解决该问题（这听起来可能很奇怪）。
+
+如果使用图片，chrome可能会严重导致分页中断，如果在封装的div中明确设置图片高度，则会有所帮助。
+```
+ <div style='height:500'>
+   <img src='foo' />
+ </div>
+```
+
+chrome/puppeteer默认不会在受限环境（例如docker）中运行，并且通常会要求传递--no-sandbox参数。这可以使用以下配置来实现。具体可参考https://github.com/GoogleChrome/puppeteer/blob/master/docs/troubleshooting.md。
+```
+ "extensions": {  
+  "chrome-pdf": {  
+    "launchOptions": {  
+      "args": ["--no-sandbox"]  
+    } 
+  }
 }
 ```
 
