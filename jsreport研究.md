@@ -1642,7 +1642,7 @@ Chrome-pdf转换引擎是使用headless chrome将html内容打印到pdf文件中
 "chrome": {
   "timeout": 30000
 }
-``
+```
 
 #### 字体
 使用资产(Assets)扩展，可以轻松地将字体嵌入到PDF报告中。您可以在此处找到有关该方法的教程。
