@@ -1741,8 +1741,8 @@ Chrome默认使用print在打印pdf时。这会影响CSS框架，例如Bootstrap
   }
 }
 ```
-或者，可以创建一个空模板并使用jsreport脚本定义url 。
-
+或者，可以创建一个空模板并使用jsreport脚本定义url。
+```
 function beforeRender(req, res) {
   req.template.chrome = {
      "url": "https://jsreport.net"
