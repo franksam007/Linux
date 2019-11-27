@@ -2358,6 +2358,11 @@ jsreport.use(require('jsreport-phantom-image')({ strategy: 'phantom-server' }))
 * blockJavaScript-阻止页面上正在运行的js
 * waitForJS-参考phantom-html-to-pdf。在这种情况下要设置的window的JSREPORT_READY_TO_START变量为true，开始渲染
 
+## 6. 模板引擎<a name='engines'></a>    [返回目录](#toc)
+jsreport使用javascript模板引擎定义报告布局。通过模板引擎，可以绑定输入数据、使用循环、条件或javascript帮助器...。模板引擎基本上提供了一种方法，可以以一种非常快速、灵活、成熟且广为人知的方式定义任何自定义报告。
+
+### 6.1 handlebars<a name='handlebars'></a>    [返回目录](#toc)
+
 ## 许可<a name='license'></a>    [返回目录](#toc)
 
 许可有jsreport_licensing包负责，详见main.js的267行。
