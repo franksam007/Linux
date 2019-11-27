@@ -1773,6 +1773,235 @@ chrome/puppeteer默认不会在受限环境（例如docker）中运行，并且�
 }
 ```
 
+###  5.3 Chrome Image<a name='chrome_pdf'></a>    [返回目录](#toc)
+#### 基础
+chrome-image转换引擎能够将html转换为图像。它就像chrome-pdf一样工作，只是某些选项有所不同。
+
+#### 选项
+这些设置反映了headless chrome  API的设置，可参考https://github.com/GoogleChrome/puppeteer/blob/master/docs/api.md#pagepdfoptions。
+
+* type
+* quality
+* fullPage
+* clipX
+* clipY
+* clipWidth
+* clipHeight
+* omitBackground
+* waitForJS
+* waitForNetworkIddle
+
+这些基本设置通常与模板一起存储，也可以通过属性template.chromeImage内的API调用发送这些基本设置。
+
+还可以使用以下方法在页面javascript中动态设置选项：
+```
+<script>
+    ...
+    window.JSREPORT_CHROME_IMAGE_OPTIONS = {
+        type:  'jpeg'
+    }
+</script>
+```
+
+#### chrome-pdf
+chrome-image与chrome-pdf是同一扩展的一部分，并且共享其配置。这意味着可以以相同的方式增加超时时间和其他选项。
+```
+"extensions": {
+  "chrome-pdf": {  
+    "timeout": 30000,
+    "launchOptions": {...}
+  }
+}
+```
+不仅配置而且许多方面都相同。例如，可以配置打印触发器、嵌入字体、重用chrome实例，甚至以相同的方式对其进行故障排除。可参阅[chrome_pdf](#chrome-pdf)。
+
+###  5.4 Xlsx<a name='xlsx'></a>    [返回目录](#toc)
+
+###  5.5 Html to Xlsx<a name='htmo_to_xlsx'></a>    [返回目录](#toc)
+html-to-xlsx转换引擎从html表生成excel xslx文件。这不是完整的html->excel转换，而是一种从jsreport创建excel文件的实用且快速的方法。转换引擎读取输入表，并使用特定的html引擎（默认为chrome）提取几个CSS样式属性，最后使用样式创建excel单元格。
+
+支持以下css属性：
+
+* background-color -单元格背景色
+* color -单元前景色
+* border-所有的border-[left|right|top|bottom]-width，border-[left|right|top|bottom]-style，boder-[left|right|top|bottom]-color用来设置Excel单元格边框。
+* text-align -在Excel单元格中水平对齐文本
+* vertical-align -在Excel单元格中垂直对齐
+* width -excel列将获得最大宽度，由于像素到excel点的转换，它可能有点不准确
+* height -Excel行将获得最高高度
+* font-family -字体系列，默认为 Calibri
+* font-size -字体大小，默认为 16px
+* font-style- normal和italic支持样式
+* font-weight -控制单元格的文本是否应为粗体
+* text-decoration- underline并且line-through受支持
+* colspan-将当前列与右侧列合并的数值
+* rowspan -将当前行与下面的行合并的数值。
+* overflow -如果将此单元格设置为scoll，则excel单元格将启用文本换行。
+
+#### 选项
+* htmlEngine- String（此处支持的值取决于jsreport安装中可用的html引擎，默认情况下仅chrome可用，但还可以安装phantom扩展并将phantom作为html引擎）
+* waitForJS- Boolean 在尝试读取页面上的html表之前是否等待js触发器启用。默认为false。
+* insertToXlsxTemplate- Boolean 控制是否应将html到excel表转换的结果添加为现有xlsx模板的新表，它需要设置xlsx模板才能起作用。默认为false。
+
+#### Sheet页
+在html源上检测到的每个表都将转换为最终xlsx文件中的新表。工作表名称默认为 Sheet1，Sheet2等等。但是，可以在table元素上设置name或data-sheet-name属性来指定自定义工作表名称，其中data-sheet-name优先级更高。
+```
+<table name="Data1">
+    <tr>
+        <td>1</td>
+    </tr>
+</table>
+<table data-sheet-name="Data2">
+    <tr>
+        <td>2</td>      
+    </tr>
+</table>
+```
+
+#### 具有数据类型的单元格
+要生成具有特定数据类型的单元格，需要data-cell-type在td元素上使用。支持的数据类型是number、boolean、date、datetime和formula（这将在下面的部分进行说明）
+```
+<table>
+    <tr>
+        <td data-cell-type="number">10</td>
+        <td data-cell-type="boolean" style="width: 85px">1</td>
+        <td data-cell-type="date">2019-01-22</td>
+        <td data-cell-type="datetime">2019-01-22T17:31:36.000-05:00</td>
+    </tr>
+</table>
+```
+
+#### 格式
+Excel支持设置单元格字符串格式。可以在元素上使用data-cell-format-str（指定原始字符串格式）或data-cell-format-enum（选择现有格式）完成此操作td。
+
+data-cell-format-enum的可能值包括：
+
+* 0 ->格式等于 general
+* 1 ->格式等于 0
+* 2 ->格式等于 0.00
+* 3 ->格式等于 #,##0
+* 4 ->格式等于 #,##0.00
+* 9 ->格式等于 0%
+* 10 ->格式等于 0.00%
+* 11 ->格式等于 0.00e+00
+* 12 ->格式等于 # ?/?
+* 13 ->格式等于 # ??/??
+* 14 ->格式等于 mm-dd-yy
+* 15 ->格式等于 d-mmm-yy
+* 16 ->格式等于 d-mmm
+* 17 ->格式等于 mmm-yy
+* 18 ->格式等于 h:mm am/pm
+* 19 ->格式等于 h:mm:ss am/pm
+* 20 ->格式等于 h:mm
+* 21 ->格式等于 h:mm:ss
+* 22 ->格式等于 m/d/yy h:mm
+* 37 ->格式等于 #,##0 ;(#,##0)
+* 38 ->格式等于 #,##0 ;[red](#,##0)
+* 39 ->格式等于 #,##0.00;(#,##0.00)
+* 40 ->格式等于 #,##0.00;[red](#,##0.00)
+* 41 ->格式等于 _(* #,##0_);_(* (#,##0);_(* "-"_);_(@_)
+* 42 ->格式等于 _("$"* #,##0_);_("$* (#,##0);_("$"* "-"_);_(@_)
+* 43 ->格式等于 _(* #,##0.00_);_(* (#,##0.00);_(* "-"??_);_(@_)
+* 44 ->格式等于 _("$"* #,##0.00_);_("$"* (#,##0.00);_("$"* "-"??_);_(@_)
+* 45 ->格式等于 mm:ss
+* 46 ->格式等于 [h]:mm:ss
+* 47 ->格式等于 mmss.0
+* 48 ->格式等于 ##0.0e+0
+* 49 ->格式等于 @
+```
+<style>
+    td {
+        width: 60px;
+        padding: 5px;
+    }
+</style>
+<table>
+    <tr>
+        <td data-cell-type="number" data-cell-format-str="0.00">10</td>
+        <td data-cell-type="number" data-cell-format-enum="3">100000</td>
+        <td data-cell-type="date" data-cell-format-str="m/d/yyy">2019-01-22</td>
+    </tr>
+</table>
+```
+
+当单元需要具有取决于特定计算机区域设置的特定格式类别时，需要设置格式。否则该单元格在excel中被归类为“常规”。
+
+例如，使用data-cell-type="date"可以将单元格设置为日期，可以在基于日期的计算中使用它。但是，excel中的单元格格式类别显示为“常规”而不是“日期”。为此，需要进行编辑data-cell-format-str以匹配区域(locale)设置。
+
+#### 方程
+可以data-cell-type="formula"在td元素上使用来指定公式单元格。
+```
+<table>
+    <tr>
+        <td data-cell-type="number">10</td>
+        <td data-cell-type="number">10</td>
+        <td data-cell-type="formula">=SUM(A1, B1)</td>
+    </tr>
+</table>
+```
+
+#### 字体系列
+可以使用以下css样式来更改表中所有单元格的默认字体系列。
+```
+td  { 
+  font-family: 'Verdana'; 
+  font-size: 18px; 
+}
+```
+
+#### 将输出插入到xlsx模板中
+在某些情况下，表到xlsx的转换就足够了。但是，对于更复杂的情况（例如使用excel生成透视表或复杂图表），可以选择将生成的表插入到现有的xlsx模板（作为新工作表）中，而不是生成新的xlsx文件。
+
+流程如下。打开桌面excel应用程序，并在一张sheet上准备数据透视表和图表，在第二张sheet上准备静态数据。将xlsx上传到jsreport studio并将其与html-to-xlsx生成动态表的模板链接。只要确保表格名称与Excel中的数据表名称匹配即可。现在运行模板可以根据jsreport收集的数据生成带有图表或数据透视图的动态excel。
+
+请参见此示例https://playground.jsreport.net/w/admin/QiHIBqsq
+
+#### 转换触发
+有时可能需要推迟表的转换，直到处理一些javascript异步任务为止。如果是这种情况，可在API选项设置htmlToXlsx.waitForJS=true或利用工作室菜单设置Wait for conversion trigger。然后，直到在模板的javascript中进行设置window.JSREPORT_READY_TO_START=true后，转换才会开始。
+```
+...
+<script>
+    // do some calculations or something async
+    setTimeout(function() {
+        window.JSREPORT_READY_TO_START = true; //this will start the conversion and read the existing tables on the page
+    }, 500);
+    ...
+</script>
+```
+#### 行高大于实际内容的问题
+当phantomjs用作引擎时，有时行高度的结尾高度大于实际内容的高度。这是由phantomjs bug引起的，该错误在单元格的内容具有空格字符时会检索到更高的高度。
+
+如果行高较大对excel文件有问题，则有两种可能的解决方法：
+
+* 使用"letter-spacing"具有某些负值的CSS属性
+```
+<!-- without "letter-spacing" row would be more larger -->
+<table style="letter-spacing: -4px">
+    <tr>
+        <td> From Date: NA</td>
+        <td> To Date: NA </td>
+        <td> Search Text: NA </td>
+        <td> Sort Order: NA </td>
+        <td> Sort Key: NA </td>
+        <td> Filter: NA </td>
+    </tr>
+</table>
+```
+* 使用"line-height: 0"具有特定"height"
+```
+<!-- without "line-height" and "height" row would be more larger -->
+<table style="line-height: 0">
+    <tr style="height: 20px">
+        <td> From Date: NA</td>
+        <td> To Date: NA </td>
+        <td> Search Text: NA </td>
+        <td> Sort Order: NA </td>
+        <td> Sort Key: NA </td>
+        <td> Filter: NA </td>
+    </tr>
+</table>
+```
+
 ## 许可<a name='license'></a>    [返回目录](#toc)
 
 许可有jsreport_licensing包负责，详见main.js的267行。
