@@ -1459,17 +1459,17 @@ jsreport render
 
 以下是支持的命令。
 
-help
-init
-repair
-configure
-win-install
-win-uninstall
-start
-render
-kill
-help
-Command available globally
+* help
+* init
+* repair
+* configure
+* win-install
+* win-uninstall
+* start
+* render
+* kill
+* help
+* Command available globally
 
 打印有关命令或特定主题的信息，您可以运行“ jsreport help -h”以获取可用主题的列表
 
@@ -2001,6 +2001,339 @@ td  {
     </tr>
 </table>
 ```
+
+###  5.6 Docx<a name='docx'></a>    [返回目录](#toc)
+docx配方根据上载的docx模板生成Office docx报告，并使用Word应用程序在其中填充了handlebar标签。
+
+1. 打开Word并创建使用handlebar模板引擎的docx文件。
+2. 将创建的docx文件作为资产上传到jsreport studio
+3. 创建模板，选择docx转换引擎并链接先前上传的资产
+4. 如果需要，请附加样本输入数据或脚本
+5. 运行模板，将获得动态组装的docx报告
+
+#### 内置助手程序
+##### docxList
+使用Word创建一个包含单个项目的列表，然后调用docxList帮助程序。它将遍历提供的数据并为每个条目创建另一个列表项。
+```
+ - {{#docxList people}}{{name}}{{/docxList}}
+```
+
+##### docxTable
+使用Word创建具有列标题和单行的表。调用{{#docxTable}}数据行的第一个单元格和结束通话{{/docxTable}}的最后一个单元格。
+```
+columnA	columnB
+{{#docxTable people}}{{name}}	{{email}}{{/ docxTable}}
+```
+
+##### docxStyle
+使用{{#docxStyle}}{{/docxStyle}}包围文本块，并传递textColor参数可动态指定文本颜色。
+```
+{{#docxStyle textColor='0000FF'}}Simple text{{/docxStyle}}
+```
+
+##### docxImage
+1. 使用Word准备图像占位符：将任何图像放置到所需位置，然后根据需要将其格式化。
+2. 选择图像，选择Word选项卡“插入”，单击“书签”并创建一个
+3. 右键单击图像，然后单击“超链接”
+4. 单击书签并选择以前创建的书签
+5. 在“插入超链接”模式下单击“屏幕提示”。
+6. 填写docxImage帮助程序调用 {{docxImage src=myDataURIForImage}}
+7. 单击确定，然后关闭超链接对话框。现在，如果对图像进行悬停，应该会看到docxImage帮助程序调用
+8. 在输入数据中运行带有myDataURIForImage属性的模板，应该会在输出中看到替换的图像。
+
+docxImage 支持以下配置属性：
+
+* src（string）->指定要加载的图像的base64 dataURI字符串表示形式
+* usePlaceholderSize（boolean）->如果为true，则图像的尺寸将设置为与docx文件上定义的占位符图像相同的尺寸。例如：{{docxImage src=src usePlaceholderSize=true}}
+* width（string）->指定图像的宽度，值可以为px或cm。当仅width设置时，height将根据图像的纵横比自动生成。例如：{{docxImage src=src width="150px"}}
+* height（string）->指定图像的高度，值可以为px或cm。当仅height设置时，width将根据图像的纵横比自动生成。例如：{{docxImage src=src height="100px"}}
+
+#### API
+```
+{
+  "template": {
+    "recipe": "docx",
+    "engine": "handlebars",
+    "docx": {
+       "templateAssetShortid": "xxxx"
+    }
+  },
+  "data": {}
+```
+如果没有将Office模板存储为资产，则可以直接在API调用中将其发送。
+```
+{
+  "template": {
+    "recipe": "docx",
+    "engine": "handlebars",
+    "docx": {
+       "templateAsset": {
+          "content": "base64 encoded word file",
+          "encoding": "base64"
+       }
+    }
+  },
+  "data": {}
+```
+
+###  5.7 Html embedded in docx<a name='html_in_docx'></a>    [返回目录](#toc)
+#### 安装
+```
+npm install jsreport-html-embedded-in-docx
+```
+#### 基础
+该html-embedded-in-docx转换引擎采用的html输出，并将其嵌入到基于DOCX报告。这是从jsreport生成docx/word报告的非常简单的方法。但是注意，此类输出docx文件在某些Office实现（如Open Office）中无法打开。
+
+###  5.8 docxtemplater<a name='docxtemplater'></a>    [返回目录](#toc)
+使用docxtemplater生成docx报告的配方
+
+#### 安装
+```
+npm install jsreport-docxtemplater
+````
+
+#### 用法
+1. 使用docxtemplater文档中介绍的标记来准备docx模板(参考https://github.com/open-xml-templating/docxtemplater）
+2. 上载docx模板
+3. 准备输入数据-使用样本数据或自定义脚本
+4. 创建新模板并将转换引擎切换到docxtemplater
+5. 关联模板资产和输入数据
+6. 将模板内容保留为空，将不会使用
+7. 运行模板
+
+#### API
+```
+{
+  "template": {
+    "recipe": "docxtemplater",
+    "engine": "handlebars",
+    "docxtemplater": {
+       "templateAssetShortid": "xxxx"
+    }
+  },
+  "data": {}
+```
+如果没有将Office模板存储为资产，则可以直接在API调用中将其发送。
+```
+{
+  "template": {
+    "recipe": "docxtemplater",
+    "engine": "handlebars",
+    "docxtemplater": {
+       "templateAsset": {
+          "content": "base64 encoded word file",
+          "encoding": "base64"
+       }
+    }
+  },
+  "data": {}
+```
+
+###  5.9 Phantom pdf<a name='phantom_pdf'></a>    [返回目录](#toc)
+Phantom-pdf使用phantomjs屏幕捕获功能将HTML内容打印到PDF文件中。这种方法在定义报告模板方面非常有效率，也是使用jsreport的最常用的方法。
+
+Phantom-pdf配方能够呈现提供的任何HTML和JavaScript。这意味着，也可以使用外部JavaScript库或画布打印可视化图表。
+
+#### 安装
+```
+npm install jsreport-phantom-pdf
+```
+#### 基本设置
+* margin-从页面边界使用的px或cm边距规格，您也可以通过Object或JSON object string来更好地控制每个边距面。例如：{ "top": "5px", "left": "10px", "right": "10px", "bottom": "5px" }
+* format -包含A3，A4，A5，Legal，Letter的预定义页面大小
+* width -px或cm的页面宽度，优先于纸张格式
+* height -px或cm的页面高度，优先于纸张格式
+* orientation -纵向或横向
+* headerHeight -页面标题的px或cm高度
+* header -标头html内容
+* footerHeight -页面中页脚的px或cm高度
+* footer -页脚html内容
+* printDelay -渲染页面与打印为pdf之间的延迟，这在打印图表等动画内容时非常有用
+* blockJavaScript -阻止执行JavaScript
+* waitForJS - 真假
+
+这些基本设置通常与模板一起存储，但也可以通过在API调用中设置属性template.phantom来发送这些基本设置。
+
+#### 分页符
+CSS包含page-break-before可用于指定html分页符的样式。这也可以用于phantom-pdf，以便在pdf文件中指定分页符。
+```
+<h1>Hello from Page 1</h1>
+
+<div style='page-break-before: always;'></div>
+
+<h1>Hello from Page 2</h1>
+
+<div style="page-break-before: always;"></div>
+
+<h1>Hello from Page 3</h1>
+```
+
+#### 页眉和页脚
+系统像完整的jsreport模板一样对页眉和页脚进行评估。这意味着可以在标题中添加例如子模板引用，然后将其提取出来。还可以使用主模板助手或页眉/页脚中的数据。
+
+#### 页码
+Phantom-pdf提供特殊标签{#pageNum}以及{#numPages}页眉和页脚，可用于打印页码。
+```
+<div style='text-align:center'>{#pageNum}/{#numPages}</div>
+```
+注意，Phantom-pdf还会在页眉和页脚中运行评估javascript，可以使用它们来修改分页开始，例如：
+```
+<span id='pageNumber'>{#pageNum}</span>
+<script>
+    var elem = document.getElementById('pageNumber');
+    if (parseInt(elem.innerHTML) <= 3) {
+        elem.style.display = 'none';
+    }
+</script>
+```
+
+#### 国家字符
+Phantom-pdf当前默认情况下无法打印某些国家字符。为了能够将正确的国家字符打印为pdf，需要首先在html中设置utf-8字符集。
+```
+<html>
+  <head>
+    <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+  </head>
+  <body>
+     ščřžý
+  </body>
+</html>
+```
+
+#### 页眉和页脚中的图像
+当尝试以常见方式将图像添加到页眉中时，图像不会显示：
+```
+<img src='http://domain.com/foo.jpg'>
+```
+这是因为页眉和页脚以同步方式打印为PDF格式。这意味着像获取图像之类的任何异步请求都不会及时完成。这是phantom.js的当前限制
+
+解决方案：
+将相同的图像添加到模板内容，并使用样式将其隐藏display:none。然后，可以将其添加到标头中，因为它已经被缓存，因此不需要异步请求，它将显示出来。对于url引用的两个图像以及数据URI方案base64图像都需要这样做。
+
+#### 页眉和页脚中的样式
+phantomjs不允许将外部样式链接到页眉和页脚。需要始终使用<style>标签内联它。如果这变得乏味，则可以使用子模板来提取并复用它。
+
+#### 打印触发器
+有时可能需要推迟PDF打印，直到处理了一些JavaScript异步任务。在这种情况下，请在API中设置phantom.waitForJS=true或在工作室菜单中启用Wait for printing trigger。然后，直到在模板的javascript中设置window.JSREPORT_READY_TO_START=true时，打印才会开始。
+```
+...
+<script>
+    // do some calculations or something async
+    setTimeout(function() {
+        window.JSREPORT_READY_TO_START = true; //this will start the pdf printing
+    }, 500);
+    ...
+</script>
+```
+
+#### macOS Sierra
+默认的phantomjs@1.9当前不适用于macOS sierra更新，需要使用phantomjs2。
+
+#### phantomjs2
+转换引擎默认安装使用phantomjs@1.9。还可以安装其他版本并并行使用。
+
+1. 使用`npm install phantomjs-exact-2-1-1`安装其他的phantomjs 
+2. 使用jsreport studio在属性中切换phantomjs版本或在api调用中设置"template.phantom.phantomjsVersion":"2.1.1"
+
+还可以在配置中全局设置默认的phantomjs版本：
+```
+"phantom": {   
+  "defaultPhantomjsVersion": "2.1.1"
+}
+```
+请注意，phantomjs2生成的字体大小与1.9不同。此外，thead当表格产生多个页面时，它不支持重复线程。
+
+### Twitter的引导
+使用响应式CSS框架（如Bootstrap）打印到PDF可能不是最好的主意。但是，它仍然有效。需要记住，输出的PDF通常看起来与HTML不一样，因为Bootstrap在@media print下包含不同的打印样式。
+
+#### 字体
+使用资产扩展，可以轻松地将字体嵌入到PDF报告中。参见资产设置。
+
+#### 在高级情况下，在每页中打印内容
+通常，如果需要在每个页面上显示一些内容，则可以使用headers或footer。
+
+但是，由于页眉和页脚的呈现方式类似于新模板，并且对于主模板中正在评估的内容没有任何上下文，因此有时会发现，页眉和页脚对于实际需求非常有限。在这种情况下，可以使用类似于在此所描述的一种方法（https://jsreport.net/blog/phantomjs-pdf-watermark）。
+
+该方法使用一些魔术数字（根据您的机器和内容以及您的最佳判断，需要调整值）来获取呈现的页面总数，并进行一些计算以能够模拟每个页面的页眉和页脚，或仅在每个页面的特定位置呈现某些内容（例如水印）。
+
+#### 在高级情况下，在每页中打印内容（pdf-utils）
+在每个页面中打印内容的另一种方法是使用pdf-utils扩展名，它提供了将动态内容合并到pdf输出中的功能。
+
+#### Windows与Unix上的尺寸
+当在Windows和Unix平台上渲染时，phantomjs 1.9.8和2.1.1都生成不同大小的PDF元素。这个问题可以参考https://github.com/ariya/phantomjs/issues/12685。因此，建议在计划运行jsreport生产实例的同一操作系统上设计报告。如果这不是可用选择，则可以尝试应用以下CSS来调整本地或生产模板上的大小。
+```
+body {
+  transform-origin: 0 0;
+  -webkit-transform-origin: 0 0;
+  transform: scale(0.654545);
+  -webkit-transform: scale(0.654545);
+}
+```
+
+#### 配置
+使用phantom标准配置文件中的配置节点。
+```
+"extensions": {
+  "phantom-pdf": {
+    "numberOfWorkers": 1
+    "timeout": 180000,
+    "allowLocalFilesAccess": false,
+    "defaultPhantomjsVersion": "1.9.8"
+  }
+}
+```
+还可以在配置中使用顶级属性phantom，不同之处在于此配置将与使用phantomjs的任何其他扩展共享，并且上面的配置代码段专门用于phantom-pdf扩展中的选项。
+```
+"extensions": {
+  "phantom": {
+    "numberOfWorkers": 1
+    "timeout": 180000,
+    "allowLocalFilesAccess": false,
+    "defaultPhantomjsVersion": "1.9.8"
+  }
+}
+```
+
+可用的配置选项：
+
+* phantom.strategy（dedicated-process | phantom-server）-第一个策略为每个任务使用一个新的phantomjs实例。第二种策略在多个请求上重用每个实例。在phantom-server性能更好的地方，默认dedicated-process值更适合某些具有代理的云和公司环境
+* phantom.numberOfWorkers（int）-指定phantom-pdf配方将使用多少个phantomjs实例。如果未填充该值，则默认情况下，jsreport将使用cpus数
+* phantom.timeout（int）-使用phantomjs为pdf渲染指定默认超时
+* phantom.allowLocalFilesAccess（bool）-默认为false。设置为true时，可以使用本地路径来获取资源。
+* phantom.host（string）-设置启动phantomjs服务器的自定义主机名，这对于需要设置特定IP的云环境很有用。
+* phantom.portLeftBoundary（number）-为phantomjs服务器设置特定的端口范围
+* phantom.portRightBoundary（number）-为phantomjs服务器设置特定的端口范围
+* phantom.defaultPhantomjsVersion（string）-设置要使用的默认phantomjs版本，请注意，如果要设置默认值以外的其他值，则必须手动安装所需的phantomjs版本（使用类似phantomjs-prebuilt或的软件包phantomjs-exact-2-1-1）。默认值：1.9.8
+
+###  5.9 Phantom Image<a name='phantom_image'></a>    [返回目录](#toc)
+使用phantomjs从html渲染图像
+
+#### 安装
+```
+npm install jsreport-phantom-image
+```
+
+#### 用法
+设置template.recipe=phantom-image在渲染请求。
+```
+{
+  template: { content: '...', recipe: 'phantom-image', engine: '...', phantomImage: { ... } }
+}
+```
+
+#### jsreport-core
+也可以将此扩展手动应用于jsreport-core
+```
+var jsreport = require('jsreport-core')()
+jsreport.use(require('jsreport-phantom-image')({ strategy: 'phantom-server' }))
+```
+
+#### 配置
+* imageType-png，gif或jpeg，默认png
+* quality -输出图像的质量（1-100），默认为100
+* printDelay-开始打印之前要等待的毫秒数
+* blockJavaScript-阻止页面上正在运行的js
+* waitForJS-参考phantom-html-to-pdf。在这种情况下要设置的window的JSREPORT_READY_TO_START变量为true，开始渲染
 
 ## 许可<a name='license'></a>    [返回目录](#toc)
 
