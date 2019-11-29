@@ -2721,7 +2721,7 @@ base64(username:password)
 ```
 
 ### Ping
-有公共端点http://jsreport-host/api/ping，可用于检查jsreport是否正在运行。该端点不在身份验证后面，因此可以从负载均衡器或docker heathcheck中使用它。
+有公共端点http://jsreport-host/api/ping， 可用于检查jsreport是否正在运行。该端点不在身份验证后面，因此可以从负载均衡器或docker heathcheck中使用它。
 
 ## Ex. 许可<a name='license'></a>    [返回目录](#toc)
 
