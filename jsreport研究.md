@@ -90,8 +90,17 @@
     
     5.10 [Phantom Image](#phantom_image)
     
+6. [模板引擎](#engines)
+
+    6.1 [handlebars](#handlebars)
     
-[许可](#license)
+    6.2 [jsrender](#jsrender)
+    
+    6.3 [EJS](#ejs）
+    
+7. [API](#api)
+
+Ex.[许可](#license)
 
 ## 1. CentOS安装<a name='install'></a>    [返回目录](#toc)
 jsreport整体上利用nodejs开发，界面主要体现在jsreport-studio上。
@@ -2453,7 +2462,7 @@ const helpers = require('handlebars-helpers')({
 });
 ```
 
-### 6.2 handlebars<a name='jsrender'></a>    [返回目录](#toc)
+### 6.2 jsrender<a name='jsrender'></a>    [返回目录](#toc)
 #### 基础
 jsreport jsrender引擎使用jsrender库，因此与它完全兼容，完整的文档位于http://www.jsviews.com/
 
@@ -2514,7 +2523,7 @@ function toUpperCase(str) {
 ```
 say hello world loudly: {{:~toUpperCase("hello world")}}
 ```
-### 子模板(Sub templates)
+#### 子模板(Sub templates)
 jsreport还支持jsrender子模板功能。当要遍历数据集合并为每个项目打印特定模板时，这可能会很方便。
 
 为此，可以使用以下语法在content字段内定义item子模板：
@@ -2529,7 +2538,7 @@ jsreport还支持jsrender子模板功能。当要遍历数据集合并为每个�
 ```
 最好将jsrender子模板与jsreport child templates一起使用，并将子模板移到专用报告模板中。这样可以将大模板分成多个模板，并使内容保持清晰。注意，在这种情况下，应该将jsreport子模板设置为None引擎和html转换引擎。
 
-### 6.3 handlebars<a name='ejs'></a>    [返回目录](#toc)
+### 6.3 EJS<a name='ejs'></a>    [返回目录](#toc)
 #### 安装
 `npm install jsreport-ejs`
 #### 基础
@@ -2558,8 +2567,8 @@ jsreport studio使用相同的API。如果文档中缺少某些内容，可以�
 ### 渲染报告
 调用报告呈现过程是最常用的API方法。下一个代码片段显示了服务端点URL以及主体模式。选项和数据字段是可选的。
 ```
-POST: https：// jsreport-host / api / report
-Headers：内容类型：application / json
+POST: https://jsreport-host/api/report
+Headers：content: application/json
 BODY:
 ```
 ```
@@ -2714,6 +2723,6 @@ base64(username:password)
 ### Ping
 有公共端点http://jsreport-host/api/ping，可用于检查jsreport是否正在运行。该端点不在身份验证后面，因此可以从负载均衡器或docker heathcheck中使用它。
 
-## 许可<a name='license'></a>    [返回目录](#toc)
+## Ex. 许可<a name='license'></a>    [返回目录](#toc)
 
 许可有jsreport_licensing包负责，详见main.js的267行。
