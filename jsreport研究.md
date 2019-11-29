@@ -2362,6 +2362,357 @@ jsreport.use(require('jsreport-phantom-image')({ strategy: 'phantom-server' }))
 jsreport使用javascript模板引擎定义报告布局。通过模板引擎，可以绑定输入数据、使用循环、条件或javascript帮助器...。模板引擎基本上提供了一种方法，可以以一种非常快速、灵活、成熟且广为人知的方式定义任何自定义报告。
 
 ### 6.1 handlebars<a name='handlebars'></a>    [返回目录](#toc)
+#### 基础
+jsreport handlebars引擎使用handlebars库，因此与它完全兼容，完整的文档位于http://handlebarsjs.com
+
+#### 数据绑定
+可以使用{{...}}标签使用来自报表输入数据的值。
+
+假设输入数据对象如下：
+```
+{
+    "title": "Hello world"
+}
+```
+可以用`{{title}}`来打印`Helo world`
+```
+<h1>{{title}}</h1>
+```
+#### 条件
+假设输入对象如下：
+```
+{
+    "shouldPrint" : true,
+    "name" : "Jan Blaha"
+}
+```
+然后，可以在if条件中使用shouldPrint布尔值。有关更复杂的情况，请参阅“参考Helpers”。
+```
+{{#if shouldPrint}}
+    <h1>{{name}}</h1>
+{{/if}}
+```
+#### 循环
+假设输入数据对象如下：
+```
+{
+    "comments": [ {"title": "New job", "body": "js developers wanted at... " }]
+}
+```
+可以使用each简单地遍历comments
+```
+{{#each comments}}
+  <h2>{{title}}</h2>
+  <div>{{body}}</div>
+{{/each}}
+```
+#### 助手程序
+jsreport报告模板包含带有javascript模板引擎标签的content字段和放置一些javascript函数的helpers字段。
+
+例如，想要一个大写的助手功能。可以在helpers字段内使用以下代码在注册全局函数：
+```
+function toUpperCase(str) {
+    return str.toUpperCase();
+}
+```
+然后，可以使用以下命令在handlebars中调用函数：
+```
+say hello world loudly: {{{toUpperCase "hello world"}}}
+```
+
+#### 从助手调用助手
+handlebars允许通过Handlebars.helpers.helperName从一个助手调用另一个助手程序。下面的片段在jsreport helpers部分显示了如何执行此操作。
+```
+const  Handlebars = require('handlebars')
+
+function helperA () {
+  return  'helperA'
+}
+
+function helperB () {
+  return  Handlebars.helpers.helperA()
+}
+```
+
+#### 第三方助手库
+有很多第三方库提供了额外的handlebar helper，例如handlebars-helpers或handlebars-intl。要在jsreport中使用这样的库，需要用npm安装它，然后require在模板帮助器的顶部安装它。
+
+`npm install handlebars-intl`
+```
+const handlebars = require('handlebars');
+
+const HandlebarsIntl = require('handlebars-intl');
+HandlebarsIntl.registerWith(handlebars);
+```
+`npm install handlebars-helpers`
+```
+const handlebars = require('handlebars');
+
+const helpers = require('handlebars-helpers')({
+  handlebars: handlebars
+});
+```
+
+### 6.2 handlebars<a name='jsrender'></a>    [返回目录](#toc)
+#### 基础
+jsreport jsrender引擎使用jsrender库，因此与它完全兼容，完整的文档位于http://www.jsviews.com/
+
+#### 数据绑定
+可以使用{{:...}}标签使用来自报表输入数据的值。
+
+假设输入数据对象如下
+```
+{
+    "title": "Hello world"
+}
+```
+可以用`{{:title}}`来打印`Hello world`
+```
+<h1>{{:title}}</h1>
+```
+#### 条件
+假设输入对象如下：
+```
+{
+    "age" : 18,
+    "name" : "Jan Blaha"
+}
+```
+然后，可以通过age以下方式在条件中使用：
+```
+{{if age >= 18}}
+    <h1>{{:name}} is elligible to drink.</h1>
+{{else}}
+    <h1>{{:name}} is not elligible to drink.</h1>
+{{/if}}
+```
+
+#### 循环
+假设输入数据对象如下
+```
+{
+    "comments": [{"title": "New job", "body": "js developers wanted at... " }]
+}
+```
+可以使用for简单地遍历comments
+```
+{{for comments}}
+  <h2>{{:title}}</h2>
+  <div>{{:body}}</div>
+{{/for}}
+```
+#### 助手
+jsreport报告模板包含带有javascript模板引擎标签的content字段和放置一些javascript函数的helpers字段。
+
+例如，想要一个大写的助手功能。可以在helpers字段内使用以下代码字段内注册全局函数：
+```
+function toUpperCase(str) {
+    return str.toUpperCase();
+}
+```
+然后可以使用以下命令在jsrender中调用函数：
+```
+say hello world loudly: {{:~toUpperCase("hello world")}}
+```
+### 子模板(Sub templates)
+jsreport还支持jsrender子模板功能。当要遍历数据集合并为每个项目打印特定模板时，这可能会很方便。
+
+为此，可以使用以下语法在content字段内定义item子模板：
+```
+<script id="itemTemplate" type="text/x-jsrender">
+    {{:#data}}
+</script>
+```
+然后，可以告诉jsrender使用以下子模板：
+```
+{{for languages tmpl="itemTemplate"/}}
+```
+最好将jsrender子模板与jsreport child templates一起使用，并将子模板移到专用报告模板中。这样可以将大模板分成多个模板，并使内容保持清晰。注意，在这种情况下，应该将jsreport子模板设置为None引擎和html转换引擎。
+
+### 6.3 handlebars<a name='ejs'></a>    [返回目录](#toc)
+#### 安装
+`npm install jsreport-ejs`
+#### 基础
+jsreport EJS引擎使用EJS库，因此与它完全兼容。可以执行所有典型的EJS数据绑定、条件、循环，甚至使用帮助器，详见http://www.ejs.co/。
+```
+<ul>
+<% for(var i=0; i<students.length; i++) {%>
+   <li><%= foo(students[i]) %></li>
+<% } %>
+</ul>
+```
+
+## 7. API<a name='api'></a>    [返回目录](#toc)
+jsreport提供了基于HTTP Rest的普通API进行渲染和CRUD
+
+### 基础
+jsreport API可以分为两个主要用例：
+
+* 呈现报告-需要调用报告呈现过程时使用它
+* 查询和CRUD-在更复杂的jsreport集成中使用它，您想在其中使用API更新或同步实体
+
+以下两节详细描述了这些主要用例。
+
+jsreport studio使用相同的API。如果文档中缺少某些内容，可以打开F12浏览器工具，然后在“网络”选项卡中查看情况。
+
+### 渲染报告
+调用报告呈现过程是最常用的API方法。下一个代码片段显示了服务端点URL以及主体模式。选项和数据字段是可选的。
+```
+POST: https：// jsreport-host / api / report
+Headers：内容类型：application / json
+BODY:
+```
+```
+   {
+      "template": { "name" : "my template"  },
+      "data" : { ... },
+      "options": { "reports": { "save": true } }
+   }
+```
+在最典型的情况下，只需要指定模板名称（或shortid）并输入数据即可。模板名称属性必须是唯一的模板名称。如果使用多个文件夹，建议传递完整路径而不是名称。例如
+```
+{
+  "template": { "name": "/myfolder/mytemplate" }"
+  "data": {}
+}
+```
+可能只想覆盖模板的某些属性。这很容易，因为在评估之前，所有请求属性都已合并到存储的模板中。例如，如果只想更改模板转换引擎，则html可以使用以下请求正文进行操作。
+```
+{
+    "template": { 
+        "name": "myTemplate",
+        "recipe": "html"
+      },
+    "data" : { ... },
+}
+```
+该模板不一定需要存储在jsreport模板存储中，并且可以在请求正文中完全定义。在这种情况下，需要至少指定需要的属性recipe、engine和content。以下代码段显示了如何定义这样的请求正文。
+```
+{
+    "template": { 
+        "content" : "Hello world {{name}}",
+        "recipe": "chrome-pdf",
+        "engine": "handlebars",
+        "chrome": {
+            "landscape": true
+        }
+    },
+    "data" : { ... },
+}
+```
+可以通过以下方式找到有效的模板属性：
+
+* 使用API对话框(可以通过工作室设置打开)
+* 使用odata元数据定义(可以从http://jsreport-host/odata/$metadata得到）
+* 在Studio中运行渲染请求时使用F12浏览器工具
+
+### Content-Disposition和报告名称
+您可以更改Content-Disposition响应头，从而使用request的options\[reportNam\]属性在下载过程中显示文件名浏览器
+```
+{
+      "template": { ... },
+      "options": { "reportName": "myreport" }
+}
+```
+文件扩展名根据正在生成的报告的内容类型添加到jsreport。例如，chrome-pdf在这种情况下，将生成“ myreport.pdf”。
+
+如果要完全控制此响应头，则可以在请求正文中指定options\['Content-Disposition'\]并覆盖默认值。
+
+### 查询和增删改查
+jsreport中的查询和CRUD API基于OData协议。您可以使用它来以编程方式查询或CRUD jsreport服务器包含的任何实体。Odata定义了jsreport遵循的一些基本标准，以下是一些最常见的调用示例。
+
+#### 查询
+获取所有实体类型
+```
+GET: https://jsreport-host/odata/$metadata
+```
+
+获取模板名称列表
+```
+GET: http://jsreport-host/odata/templates?$select=name
+```
+获取具有特定名称的脚本
+```
+GET: http://jsreport-host/odata/scripts?$filter=name eq \'myscript\'
+```
+获取特定文件夹中的资产
+```
+GET: http://jsreport-host/odata/assets?$filter=folder/shortid eq \'abc\'
+```
+
+#### 增删改查
+创建一个模板
+```
+POST: http://jsreport-host/odata/templates
+Headers: Content-Type: application/json
+BODY:
+
+  {
+    "name":"demo",
+    "recipe":"chrome-pdf",
+    "engine":"handlebars",
+    "content":"<h1>sample content</h1>"
+  }
+```
+按ID读取模板
+```
+GET: http://jsreport-host/odata/templates('xxxxxxxxxx')
+```
+更新模板属性
+```
+PATCH: http://jsreport-host/odata/templates(WOIzhZdfjj7rRRO2)
+Headers: Content-Type: application/json
+BODY: send the properties that you want to change
+
+  {
+    "content": "updated content"
+  }
+```
+删除模板
+```
+DELETE：http：// jsreport-host / odata / templates（UCV8p6iVIzR6pEz8）
+```
+#### 文件夹
+
+文件夹就像模板一样是实体，可以对它们使用相同的odata调用。
+
+例如，可以使用列出所有文件夹
+```
+GET: http://jsreport-host/odata/folders
+```
+获取特定文件夹中的模板
+```
+GET: http://jsreport-host/odata/templates?$filter=folder/shortid eq 'foo'
+```
+在根文件夹中获取模板
+```
+GET: http://jsreport-host/odata/templates?$filter=folder eq null
+```
+在特定文件夹中创建模板
+```
+POST: http://jsreport-host/odata/templates
+
+  {
+    "name": "template name",
+    "engine": "none",
+    "recipe": "html",
+    "folder": {
+      "shortid": "foldershortid" 
+    }
+  }
+```
+### 认证
+当jsreport服务器启用了身份验证扩展时，或使用jsreportonline时，需要向所有API请求添加身份验证头信息。头信息基于基本的http身份验证，因此应该能够轻松地从任何平台进行身份验证。
+```
+Authorization: Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==
+```
+哈希值基于用户名和密码：
+```
+base64(username:password)
+```
+
+### Ping
+有公共端点http://jsreport-host/api/ping，可用于检查jsreport是否正在运行。该端点不在身份验证后面，因此可以从负载均衡器或docker heathcheck中使用它。
 
 ## 许可<a name='license'></a>    [返回目录](#toc)
 
