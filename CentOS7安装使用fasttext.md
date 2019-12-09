@@ -6,7 +6,7 @@ fastText建立在现代Mac OS和Linux发行版上。由于它使用C ++ 11功能
 
 编译是使用Makefile进行的，因此您需要有一个make。对于单词相似性评估脚本，您将需要：
 
-* python 2.6或更高版本
+* python 2.6或更高版本(需要开发环境，`sudo yum install -y python-devel`)
 * numpy＆scipy
 
 ## 构建fastText作为命令行工具
