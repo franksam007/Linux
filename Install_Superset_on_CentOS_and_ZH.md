@@ -14,7 +14,16 @@ Superset有多种安装方式，这里采用源码安装，以便于后边构建
 ```
 这里使用了Python虚拟环境，也可以不用！
 
-Superset是用Python写的，所以Python环境提前搞好，最好用3.6.x版本，因为Superset将来不再支持2.x。
+Superset是用Python写的，所以Python环境提前搞好，最好用3.6.x版本，因为Superset将来不再支持2.x。最好同时安装gcc、gcc-c++以及python开发包：
+```
+# 安装开发所需python包是需要下列系统包
+# yum install gcc
+# yum install redhat-rpm-config
+# yum install gcc-c++
+# yum install python36-devel 
+# yum install mysql-devel  #安装开发所需python包时需要，具体是mysqlclient-1.4.2需要
+```
+因为安装某些python包时需要编译
 
 ### 安装必要Python包
 `pip install -r incubator-superset/requirements.txt`
@@ -46,13 +55,6 @@ cd incubator-superset/suprset/assets # 进入到前端的工作目录
 npm install
 npm run build
 ```
-
-### 安装
-```
-(venv) # cd ../../   #进入代码顶层目录
-(venv) # python setup.py install
-```
-墙内pip直接安装太费劲，所以设置一下国内镜像，参考https://www.jianshu.com/p/1e5e12454006
 
 ### 创建数据库
 ```
@@ -105,6 +107,14 @@ MAPBOX_API_KEY = ''
 
 可根据需要修改元数据连接，例如：
 `SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://superset:superset@mysql-db-host-name:3306/superset?charset=utf8'`
+
+### 安装
+从源文件安装
+```
+(venv) # cd ../../   #进入代码顶层目录
+(venv) # python setup.py install
+```
+墙内pip直接安装太费劲，所以设置一下国内镜像，参考https://www.jianshu.com/p/1e5e12454006
 
 ### 初始化
 
