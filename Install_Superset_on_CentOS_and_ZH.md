@@ -674,3 +674,43 @@ class CustomSsoSecurityManager(SupersetSecurityManager):
 Gamma角色添加权限
 
 默认Gamma角色不能访问库，需设置角色，添加all database access on all_database_access权限（全部数据库）。
+
+#### 嵌入其他应用页面
+##### 设置公共角色权限
+给公用角色添加以下权限：
+```
+can explore json on Superset, can dashboard on Superset, all database access on all_database_access
+```
+
+##### 利用iframe嵌入到其他页面
+在目标网页中加入
+```
+<iframe src="linkToYourDashBoard?standalone=true"></iframe>
+```
+其中standalone=true表面不渲染superset的菜单，只显示dashboard本身
+
+如果不起作用，可以使用<embed>标签
+```
+<embed src="linkToYourDashBoard?standalone=true" height="300" width="300" />
+````
+
+##### 修改superset_config.py
+并在superset_config.py中将
+```
+HTTP_HEADERS = {'X-Frame-Options': 'SAMEORIGIN'}
+```
+改为
+```
+HTTP_HEADERS = {'X-Frame-Options': 'ALLOWALL'}
+```
+或
+```
+HTTP_HEADERS = {}
+```
+不要忘记将superset_config.py加入python的路径中
+
+##### 利用URL参数过滤Dashboard
+可以使用URL参数对Dashboard进行过滤,例如：
+```
+preselect_filters={"76":{"tableColumnName":["value1"]}}
+```
