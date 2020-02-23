@@ -10,7 +10,19 @@ Superset有多种安装方式，这里采用源码安装，以便于后边构建
 ```
 # cd  incubator-superset
 # virtualenv venv　或 python -m venv venv
+
+# 如果报错
+# Error: Command '['/home/.../venv/bin/python', '-Im', 'ensurepip', '--upgrade', '--default-pip']' returned non-zero exit status 1.
+# 可先创建没有PIP的虚拟环境，然后启动虚拟环境后，自行安装pip
+# python -m venv --without-pip venv
+
 # . ./venv/bin/activate
+
+# 在直接创建虚拟环境报错的情况下，自行安装pip
+# （虚拟环境下）curl https://bootstrap.pypa.io/get-pip.py | python
+# 更新pip
+# （虚拟环境下）pip install --upgrade pip
+# 
 ```
 这里使用了Python虚拟环境，也可以不用！
 
@@ -31,7 +43,9 @@ Superset是用Python写的，所以Python环境提前搞好，最好用3.6.x版�
 `pip install -r incubator-superset/requirements-dev.txt`
 
 如果离线，可以先在有网络连接的机器上下载python包，然后再安装：
+
 `pip download -d ./pkg -r requirements.txt`
+
 `pip install --no-index --find-links=file:./pkg -r requirements.txt`
 
 如果出现`mysql_config not found`错误，则需要安装libmysqlclient-dev
@@ -49,9 +63,17 @@ Superset是用Python写的，所以Python环境提前搞好，最好用3.6.x版�
 (venv) # yarn
 (venv) # yarn run build
 ```
+
+#注意新版本应将将前端剥离出来，放到superset-frontend，则需要执行（2020年2月23日）
+```
+(venv) # cd superset-frontend
+(venv) # yarn
+(venv) # yarn run build
+```
+
 注意也可以用npm编译（如果未安装yarn）
 ```
-cd incubator-superset/suprset/assets # 进入到前端的工作目录
+cd incubator-superset/suprset/assets # 进入到前端的工作目录。注意：新版本assets的内容移动到superset-frontend
 npm install
 npm run build
 ```
@@ -111,7 +133,7 @@ MAPBOX_API_KEY = ''
 ### 安装
 从源文件安装
 ```
-(venv) # cd ../../   #进入代码顶层目录
+(venv) # cd ../../   #进入代码顶层目录（目前是incubator-superset)
 (venv) # python setup.py install
 ```
 墙内pip直接安装太费劲，所以设置一下国内镜像，参考https://www.jianshu.com/p/1e5e12454006
@@ -167,27 +189,27 @@ gunicorn --bind  0.0.0.0:8088 \
 ========================
 
 下面为直接安装方式
-1. Install supersets
+1. 利用pip安装supersets
 
 `pip install superset`
 
-2.Initialize the database
+2.初始化DB
 `superset db upgrade`
 
-3. Create an admin user (you will be prompted to set a username, first and last name before setting a password)
+3. 创建管理员账号
 ```
 $ export FLASK_APP=superset
 flask fab create-admin
 ```
-4. Load some data to play with
+4. 导入样例数据
 
 `superset load_examples`
 
-5. Create default roles and permissions
+5. 创建默认角色和权限
 ```
 superset init
 ```
-6. To start a development web server on port 8088, use -p to bind to another port
+6. 启动开发服务器
 ```
 superset run -p 8080 --with-threads --reload --debugger
 ```
@@ -198,6 +220,8 @@ superset run -p 8080 --with-threads --reload --debugger
 可以看到Superset自身支持国际化，右上角可以切换语言。但是使用中文时，汉化的不是很完全，需要自己动手做些事情。
 
 ### 修改config.py源码
+注意：应在安装之前完成，源代码目录中的修改才能反映到安装的版本中。如果顺序颠倒了，可通过重新执行python setup.py install更新安装的版本，或者直接到系统的python/site-packages/相依目录下修改
+
 ```
 # Setup default language
 BABEL_DEFAULT_LOCALE = 'zh'
@@ -271,7 +295,7 @@ superset/views/core.py
 \superset\assets\src\profile\components\UserInfo.jsx
 \superset\assets\src\profile\components\RecentActivity.jsx
 ```
-用到了`\superset\assets\src\components\TableLoader.jsx`，而组件使用了reactable-arc中的Table空间，且其columns设置成字符串数组，而原控件支持将columns设为{key, label}对象数组，从而利用label来国际化（汉化），否则表头与作为字符串数组columns中的字段名称相同。
+用到了`\superset\assets\src\components\TableLoader.jsx`，而组件使用了reactable-arc中的Table控件，且其columns设置成字符串数组，而原控件支持将columns设为{key, label}对象数组，从而利用label来国际化（汉化），否则表头与作为字符串数组columns中的字段名称相同。
 
 
 ### 翻译messages.po文件
@@ -301,7 +325,7 @@ javascript文件中的翻译对照关系存放在messages.json文件中，根据
 
 ### 关于JSX文件
 
-superset是使用python的一个框架（reactjs?），将jsx文件（类似javascript文件）静态编译为不可修改的jsx.html文件，一般情况下，如果在jsx文件或者是jsx.html文件中的字段使用。
+superset是使用reactjs框架（reactjs?），将jsx文件（类似javascript文件）静态编译为不可修改的jsx.html文件，一般情况下，如果在jsx文件或者是jsx.html文件中的字段使用。
 
 在JSX文件中，采用以下形式：
 
@@ -343,7 +367,7 @@ superset是使用python的一个框架（reactjs?），将jsx文件（类似java
         --less
             --cosmo
                 --bootswatch.less   // 修改样式的地方
-        --superset.less             //  修改全局样式的地方
+        --superset.less             // 修改全局样式的地方
 
 
 注意： 本地安装开发环境的时候，react版本最好不要升级,坑也挺多,就按照他的版本来.
@@ -351,7 +375,7 @@ superset是使用python的一个框架（reactjs?），将jsx文件（类似java
         1. prop-types 会提示相关报错, 问题在于react版本。@15和@16版本中prop-types的差异,升级的react版本到       @16.**的注意一下
 
         2.会提示Cannot find module 'react/lib/*****'等未知模块 
-            想要好办法？二话不说丢给你一个网站  https://www.jianshu.com/p/43b7db635f8c 按步骤运行！
+            请参考  https://www.jianshu.com/p/43b7db635f8c 按步骤运行！
 
         3.想找react-router? 找不到的，他压根就不是spa, 虽然在react写的 （此时劝诫自己要压住怒火）
             
@@ -390,3 +414,263 @@ flash_appbuilder/templates
         
     注意： views/core.py 是路由，通过上述代码可以看懂路由是怎么跳转和调用模板渲染的。
 ```
+### 外部认证及单点登录
+
+#### 外部认证
+superset是由flask_appbuilder生成，继承了flask_appbuilder的外部认证设置。
+```
+import os
+from flask_appbuilder.security.manager import (
+    AUTH_OID,
+    AUTH_REMOTE_USER,
+    AUTH_DB,
+    AUTH_LDAP,
+    AUTH_OAUTH,
+)
+
+basedir = os.path.abspath(os.path.dirname(__file__))
+
+# Your App secret key
+SECRET_KEY = "\2\1thisismyscretkey\1\2\e\y\y\h"
+
+# The SQLAlchemy connection string.
+SQLALCHEMY_DATABASE_URI = "sqlite:///" + os.path.join(basedir, "app.db")
+# SQLALCHEMY_DATABASE_URI = 'mysql://myapp@localhost/myapp'
+# SQLALCHEMY_DATABASE_URI = 'postgresql://root:password@localhost/myapp'
+
+# Flask-WTF flag for CSRF
+CSRF_ENABLED = True
+
+# ------------------------------
+# GLOBALS FOR APP Builder
+# ------------------------------
+# Uncomment to setup Your App name
+# APP_NAME = "My App Name"
+
+# Uncomment to setup Setup an App icon
+# APP_ICON = "static/img/logo.jpg"
+
+# ----------------------------------------------------
+# AUTHENTICATION CONFIG
+# ----------------------------------------------------
+# The authentication type
+# AUTH_OID : Is for OpenID
+# AUTH_DB : Is for database (username/password()
+# AUTH_LDAP : Is for LDAP
+# AUTH_REMOTE_USER : Is for using REMOTE_USER from web server
+AUTH_TYPE = AUTH_OAUTH
+
+OAUTH_PROVIDERS = [
+    {
+        "name": "twitter",
+        "icon": "fa-twitter",
+        "remote_app": {
+            "consumer_key": os.environ.get("TWITTER_KEY"),
+            "consumer_secret": os.environ.get("TWITTER_SECRET"),
+            "base_url": "https://api.twitter.com/1.1/",
+            "request_token_url": "https://api.twitter.com/oauth/request_token",
+            "access_token_url": "https://api.twitter.com/oauth/access_token",
+            "authorize_url": "https://api.twitter.com/oauth/authenticate",
+        },
+    },
+    {
+        "name": "google",
+        "icon": "fa-google",
+        "token_key": "access_token",
+        "remote_app": {
+            "consumer_key": os.environ.get("GOOGLE_KEY"),
+            "consumer_secret": os.environ.get("GOOGLE_SECRET"),
+            "base_url": "https://www.googleapis.com/oauth2/v2/",
+            "request_token_params": {"scope": "email profile"},
+            "request_token_url": None,
+            "access_token_url": "https://accounts.google.com/o/oauth2/token",
+            "authorize_url": "https://accounts.google.com/o/oauth2/auth",
+        },
+    },
+    {
+        "name": "azure",
+        "icon": "fa-windows",
+        "token_key": "access_token",
+        "remote_app": {
+            "consumer_key": os.environ.get("AZURE_APPLICATION_ID"),
+            "consumer_secret": os.environ.get("AZURE_SECRET"),
+            "base_url": "https://login.microsoftonline.com/{AZURE_TENANT_ID}/oauth2",
+            "request_token_params": {
+                "scope": "User.read name preferred_username email profile",
+                "resource": os.environ.get("AZURE_APPLICATION_ID"),
+            },
+            "request_token_url": None,
+            "access_token_url": "https://login.microsoftonline.com/{AZURE_TENANT_ID}/oauth2/token",
+            "authorize_url": "https://login.microsoftonline.com/{AZURE_TENANT_ID}/oauth2/authorize",
+        },
+    },
+]
+
+# Uncomment to setup Full admin role name
+# AUTH_ROLE_ADMIN = 'Admin'
+
+# Uncomment to setup Public role name, no authentication needed
+# AUTH_ROLE_PUBLIC = 'Public'
+
+# Will allow user self registration
+AUTH_USER_REGISTRATION = True
+
+# The default user self registration role
+AUTH_USER_REGISTRATION_ROLE = "Admin"
+
+# When using LDAP Auth, setup the ldap server
+# AUTH_LDAP_SERVER = "ldap://ldapserver.new"
+# AUTH_LDAP_USE_TLS = False
+
+# Uncomment to setup OpenID providers example for OpenID authentication
+# OPENID_PROVIDERS = [
+#    { 'name': 'Google', 'url': 'https://www.google.com/accounts/o8/id' },
+#    { 'name': 'Yahoo', 'url': 'https://me.yahoo.com' },
+#    { 'name': 'AOL', 'url': 'http://openid.aol.com/<username>' },
+#    { 'name': 'Flickr', 'url': 'http://www.flickr.com/<username>' },
+#    { 'name': 'MyOpenID', 'url': 'https://www.myopenid.com' }]
+# ---------------------------------------------------
+# Babel config for translations
+# ---------------------------------------------------
+# Setup default language
+BABEL_DEFAULT_LOCALE = "en"
+# Your application default translation path
+BABEL_DEFAULT_FOLDER = "translations"
+# The allowed translation for you app
+LANGUAGES = {
+    "en": {"flag": "gb", "name": "English"},
+    "pt": {"flag": "pt", "name": "Portuguese"},
+    "pt_BR": {"flag": "br", "name": "Pt Brazil"},
+    "es": {"flag": "es", "name": "Spanish"},
+    "de": {"flag": "de", "name": "German"},
+    "zh": {"flag": "cn", "name": "Chinese"},
+    "ru": {"flag": "ru", "name": "Russian"},
+}
+# ---------------------------------------------------
+# Image and file configuration
+# ---------------------------------------------------
+# The file upload folder, when using models with files
+UPLOAD_FOLDER = basedir + "/app/static/uploads/"
+
+# The image upload folder, when using models with images
+IMG_UPLOAD_FOLDER = basedir + "/app/static/uploads/"
+
+# The image upload url, when using models with images
+IMG_UPLOAD_URL = "/static/uploads/"
+# Setup image size default is (300, 200, True)
+# IMG_SIZE = (300, 200, True)
+
+# Theme configuration
+# these are located on static/appbuilder/css/themes
+# you can create your own and easily use them placing them on the same dir structure to override
+# APP_THEME = "bootstrap-theme.css"  # default bootstrap
+# APP_THEME = "cerulean.css"
+# APP_THEME = "amelia.css"
+# APP_THEME = "cosmo.css"
+# APP_THEME = "cyborg.css"
+# APP_THEME = "flatly.css"
+# APP_THEME = "journal.css"
+# APP_THEME = "readable.css"
+# APP_THEME = "simplex.css"
+# APP_THEME = "slate.css"
+# APP_THEME = "spacelab.css"
+# APP_THEME = "united.css"
+# APP_THEME = "yeti.css"
+
+```
+
+#### CAS单点登录
+修改config.py
+```
+from flask_appbuilder.security.manager import AUTH_REMOTE_USER
+
+AUTH_TYPE=AUTH_REMOTE_USER
+
+from custom_sso_security_manager import CustomSsoSecurityManager
+CUSTOM_SECURITY_MANAGER = CustomSsoSecurityManager
+AUTH_USER_REGISTRATION = True   #允许用户注册
+AUTH_USER_REGISTRATION_ROLE = "Gamma"  #设置默认添加用户角色
+```
+
+superset根目录添加custom_sso_security_manager.py
+```
+from superset.security import SupersetSecurityManager
+import logging
+from flask_appbuilder.security.views import AuthRemoteUserView, expose
+from flask_appbuilder.const import LOGMSG_WAR_SEC_LOGIN_FAILED
+from flask import request,g, redirect
+from flask_login import login_user, logout_user
+import requests
+import json
+
+logger = logging.getLogger(__name__)
+
+
+CAS_LOGIN_SERVER_URL = 'http://xxxxx/api/login/casLogin'
+CAS_CHECK_SERVER_URL = 'http://xxxxx/api/login/currentUser'
+CAS_LOGINOUT_SERVER_URL = 'http://xxxxx/api/login/out'
+
+class MyAuthRemoteUserView(AuthRemoteUserView):
+    # this front-end template should be put under the folder `superset/templates/appbuilder/general/security`
+    # so that superset could find this templates to render
+    login_template = 'appbuilder/general/security/login_my.html'
+    title = "My Login"
+
+    # this method is going to overwrite 
+    # https://github.com/dpgaspar/Flask-AppBuilder/blob/master/flask_appbuilder/security/views.py#L556
+    @expose('/login/', methods=['GET', 'POST'])
+    def login(self):
+        print("My special login...")
+        if not g.user or not g.user.get_id():
+            return redirect(CAS_LOGIN_SERVER_URL+"?redirect="+request.host_url+"logincas")
+
+        print("loginSSO")
+        print(request.host_url)
+
+    @expose('/logincas/', methods=['GET', 'POST'])
+    def logincas(self):
+        token=request.args.get('token')
+        print("logincas"+token)
+        manager=self.appbuilder.sm
+
+        result = requests.get(CAS_CHECK_SERVER_URL + '?token=' + token)
+        userCAS = json.loads(result.content)
+        username=userCAS["loginName"]
+        user = manager.find_user(username=username)
+        print(user)
+
+        # User does not exist, create one if auto user registration.
+        if user is None and manager.auth_user_registration:
+            user = manager.add_user(
+            # All we have is REMOTE_USER, so we set
+            # the other fields to blank.
+                username=username,
+                first_name=username.split('@')[0],
+                last_name='-',
+                email=username,
+                role=manager.find_role(manager.auth_user_registration_role))
+
+        # If user does not exist on the DB and not auto user registration,
+        # or user is inactive, go away.
+        elif user is None or (not user.is_active):
+            logger.info(LOGMSG_WAR_SEC_LOGIN_FAILED.format(username))
+            return None
+            
+        manager.update_user_auth_stat(user)
+        print(user)
+        login_user(user, remember=False)
+        return redirect(self.appbuilder.get_url_for_index)
+
+    @expose("/logout/")
+    def logout(self):
+        logout_user()
+        print("loginout")
+        return redirect(CAS_LOGINOUT_SERVER_URL+'?redirect='+request.host_url)
+       
+
+class CustomSsoSecurityManager(SupersetSecurityManager):
+    authremoteuserview=MyAuthRemoteUserView
+```
+Gamma角色添加权限
+
+默认Gamma角色不能访问库，需设置角色，添加all database access on all_database_access权限（全部数据库）。
