@@ -714,3 +714,4 @@ HTTP_HEADERS = {}
 ```
 preselect_filters={"76":{"tableColumnName":["value1"]}}
 ```
+上例中的“76”是过滤框的ID，在Slice（charts）列表中通过指向图表连接中看到slice_id=xxx，其中xxx即为内部的ID
