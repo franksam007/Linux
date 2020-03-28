@@ -96,6 +96,18 @@ minikube config set memory 4096
 ```
 minikube start --driver=<driver_name>
 ```
+
+如果拉取image失败，提示：
+```
+docker: Error response from daemon: Get https://gcr.io/v2/: net/http: request canceled while waiting for connection (Client.Timeout exceeded while awaiting headers).
+```
+则需要从国内镜像拉取image：
+```
+minikube start –-image-repository=registry.cn-hangzhou.aliyuncs.com/google_containers
+或 
+minikube start –-image-mirror-country=cn
+```
+
 2. 一旦minikube start完成后，运行下面的命令检查集群的状态：
 ```
 minikube status
