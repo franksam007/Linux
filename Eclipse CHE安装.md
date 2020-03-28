@@ -109,6 +109,8 @@ docker: Error response from daemon: Get https://gcr.io/v2/: net/http: request ca
 则需要从国内镜像拉取image：
 ```
 minikube start –-image-repository=registry.cn-hangzhou.aliyuncs.com/google_containers
+或（上一个找不到gcr.io/k8s-minikube/kicbase:v0.0.8
+minikube start --image-repository=gcr.azk8s.cn
 或 
 minikube start –-image-mirror-country=cn
 ```
