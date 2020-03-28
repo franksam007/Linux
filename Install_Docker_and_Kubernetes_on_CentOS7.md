@@ -123,6 +123,7 @@ curl -LO https://storage.googleapis.com/kubernetes-release/release/v1.10.3/bin/l
   "registry-mirrors": [
     "https://dockerhub.azk8s.cn",
     "https://docker.mirrors.ustc.edu.cn",
+    "https://hub-mirror.c.163.com",
     "https://registry.docker-cn.com"
   ]
 }
