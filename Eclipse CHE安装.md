@@ -88,6 +88,11 @@ minikube config set driver docker
 minikube config set memory 4096
 ```
 
+4. Minikube的配置文件在如下路径
+```
+~/.minikube/machines/minikube/config.json
+```
+
 ##### minikube启停集群
 
 1. 要确认虚拟机管理程序和Minikube均已成功安装，可以运行以下命令来启动本地Kubernetes集群：
@@ -138,6 +143,51 @@ machine does not exist
 ```
 minikube delete
 ```
+
+##### 打开控制台
+```
+minikube dashboard
+```
+
+##### 检测集群状态，运行:
+```
+kubectl cluster-info
+```
+
+##### 查看集群状态（启动后）
+```
+kubectl config view
+```
+
+##### 检验Node状态:
+```
+kubectl get nodes
+
+NAME       STATUS   ROLES    AGE   VERSION
+minikube   Ready    master   11m   v1.15.0
+```
+
+##### 使用ssh进入Minikube虚机:
+```
+sudo minikube ssh
+```
+
+##### 打开Kubernetes控制台
+Kubernete附带一个web，允许您在不与命令行交互的情况下管理集群。在minikube上默认安装并启用仪表板插件
+```
+$ minikube addons list
+```
+
+要直接在默认浏览器上打开，请使用:
+```
+$ minikube dashboard
+```
+
+获取仪表板的URL
+```
+$ minikube dashboard --url
+```
+
 ### 安装chectl管理工具
 
 #### 先决条件
@@ -167,4 +217,11 @@ $ chectl --version
 4. 阅读安装日志。
 ```
 $ cat chectl-install.log
+```
+
+### 利用chectl安装CHE
+
+使用minikube作为基础环境：
+```
+$ chectl server:start --platform minikube
 ```
