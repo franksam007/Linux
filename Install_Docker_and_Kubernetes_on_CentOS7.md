@@ -78,8 +78,9 @@ sudo systemctl start docker #启动服务
 
 `sudo ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose`
 
-## Install Kubernetes
-### 建立Repo
+## 安装Kubernetes
+### 利用国内repo镜像
+#### CentOS/RHEL/Fedora
 
 ```
 cat <<EOF > /etc/yum.repos.d/kubernetes.repo
@@ -91,11 +92,93 @@ gpgcheck=1
 repo_gpgcheck=1
 gpgkey=https://mirrors.aliyun.com/kubernetes/yum/doc/yum-key.gpg https://mirrors.aliyun.com/kubernetes/yum/doc/rpm-package-key.gpg
 EOF
-```
 
-### 安装Kubernetes
-```
 setenforce 0
 yum install -y kubelet kubeadm kubectl
 systemctl enable kubelet && systemctl start kubelet
 ```
+
+#### Debian / Ubuntu
+```
+apt-get update && apt-get install -y apt-transport-https
+curl https://mirrors.aliyun.com/kubernetes/apt/doc/apt-key.gpg | apt-key add - 
+cat <<EOF >/etc/apt/sources.list.d/kubernetes.list
+deb https://mirrors.aliyun.com/kubernetes/apt/ kubernetes-xenial main
+EOF  
+apt-get update
+apt-get install -y kubelet kubeadm kubectl
+```
+
+### 利用curl
+```
+curl -LO https://storage.googleapis.com/kubernetes-release/release/v1.10.3/bin/linux/amd64/kubectl
+```
+
+可参考https://kubernetes.io/docs/tasks/tools/install-kubectl/#install-kubectl-binary-via-curl
+
+
+## 拉取gcr.io镜像
+通过阿里云镜像+GitHub来在gcr.io镜像基础上，通过Dockerfile重新构建一个镜像，并修改标签为同名gcr.io镜像。
+
+参考文档：
+* 如何借助阿里云免费获取gcr.io上的镜像(https://blog.csdn.net/yjf147369/article/details/80290881)
+
+以k8s.gcr.io/kube-apiserver-amd64:v1.10.3为例：
+
+### Fork docker-library in GitHub
+1. 参照上面的参考文章，fork了docker-library的repository。（如果想直接使用v1.10.3版本也可以直接folk我修改后的 docker-library )
+
+2. 在kube-apiserver-amd64目录下创建一个v1.10.3子目录
+
+3. 在该子目录下复制一个Dockerfile，修改基础镜像版本为v1.10.3，例子：
+`FROM gcr.io/google_containers/kube-apiserver-amd64:v1.10.3`
+
+### 在阿里云上新建镜像仓库
+打开阿里云容器镜像服务：https://cr.console.aliyun.com ， 新建一个镜像仓库。
+
+1. 选择离自己比较近的区域
+
+2. 按提示填写信息
+
+3. 选择”代码变更时自动构建镜像“和”海外机器构建“，并填写构建信息，比如：
+```
+代码分支：branches:master
+Dockerfile目录：/kube-apiserver-amd64/v1.10.3
+Dockerfile文件名：Dockerfile
+镜像版本：v1.10.3
+```
+
+### 构建、拉取镜像和打gcr.io标签
+1. 点击【管理】，选择【构建】，点击【立即构建】
+
+2. 构建成功后，在【基础信息】中查看用法
+
+3. 拉取新构建成功的镜像，比如：
+```
+# 拉取新构建的镜像
+docker pull registry.cn-shenzhen.aliyuncs.com/cookcodeblog/kube-apiserver-amd64:v1.10.3
+# 打上gcr.io同名标签
+docker tag registry.cn-shenzhen.aliyuncs.com/cookcodeblog/kube-apiserver-amd64:v1.10.3 k8s.gcr.io/kube-apiserver-amd64:v1.10.3
+# 查看镜像
+docker images
+# 删除新构建的镜像，只保留gcr.io镜像
+docker rmi registry.cn-shenzhen.aliyuncs.com/cookcodeblog/kube-apiserver-amd64:v1.10.3
+# 再次查看镜像
+docker images
+```
+
+一个拉取kubeadm镜像的脚本请参见：https://github.com/cookcodeblog/k8s-deploy/blob/master/kubeadm/04_pull_kubernetes_images_from_aliyun.sh
+
+### 查看gcr.io官方镜像
+在前面的docker-library中需要知道准确的镜像名称和镜像标签。
+
+在科学上网的情况下，打开 https://console.cloud.google.com/gcr/images/google-containers/GLOBAL ，在右边的“过滤条件“中输入关键词来搜索。
+
+然后再选择正确的镜像。
+
+通常，gcr.io官方镜像的命名规则为：
+`gcr.io/google_containers/IMAGE_NAME:IMAGE_TAG`
+
+例如：
+`gcr.io/google_containers/kube-apiserver-amd64:v1.10.3`
+
