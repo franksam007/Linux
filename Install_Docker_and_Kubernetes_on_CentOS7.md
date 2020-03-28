@@ -134,6 +134,20 @@ $ sudo systemctl restart docker
 ```
 注意：文件内容必须符合 json 规范，否则Docker无法启动。
 
+|-|-|-|
+
+|global	|proxy in China	|format	|example|
+
+|-|-|-|
+
+|dockerhub (docker.io)	|dockerhub.azk8s.cn	|dockerhub.azk8s.cn/<repo-name>/<image-name>:<version>	|dockerhub.azk8s.cn/microsoft/azure-cli:2.0.61 dockerhub.azk8s.cn/library/nginx:1.15|
+
+|gcr.io	|gcr.azk8s.cn	|gcr.azk8s.cn/<repo-name>/<image-name>:<version>	|gcr.azk8s.cn/google_containers/hyperkube-amd64:v1.13.5|
+
+|quay.io	|quay.azk8s.cn	|quay.azk8s.cn/<repo-name>/<image-name>:<version>	|quay.azk8s.cn/deis/go-dev:v1.10.0|
+
+|-|-|-|
+
 ## 拉取gcr.io镜像
 通过阿里云镜像+GitHub来在gcr.io镜像基础上，通过Dockerfile重新构建一个镜像，并修改标签为同名gcr.io镜像。
 
