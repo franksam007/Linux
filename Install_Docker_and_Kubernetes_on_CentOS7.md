@@ -116,6 +116,23 @@ curl -LO https://storage.googleapis.com/kubernetes-release/release/v1.10.3/bin/l
 
 可参考https://kubernetes.io/docs/tasks/tools/install-kubectl/#install-kubectl-binary-via-curl
 
+## 使用国内加速器
+对于使用systemd的系统(Ubuntu 16.04+、Debian 8+、CentOS 7+)，可以创建 /etc/docker/daemon.json文件，并写入如下内容：
+```
+{
+  "registry-mirrors": [
+    "https://dockerhub.azk8s.cn",
+    "https://docker.mirrors.ustc.edu.cn",
+    "https://registry.docker-cn.com"
+  ]
+}
+```
+然后重新启动Docker服务
+```
+$ sudo systemctl daemon-reload
+$ sudo systemctl restart docker
+```
+注意：文件内容必须符合 json 规范，否则Docker无法启动。
 
 ## 拉取gcr.io镜像
 通过阿里云镜像+GitHub来在gcr.io镜像基础上，通过Dockerfile重新构建一个镜像，并修改标签为同名gcr.io镜像。
