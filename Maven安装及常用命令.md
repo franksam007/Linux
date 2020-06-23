@@ -1,3 +1,11 @@
+## Maven安装
+```
+sudo wget http://repos.fedorapeople.org/repos/dchen/apache-maven/epel-apache-maven.repo -O /etc/yum.repos.d/epel-apache-maven.repo
+
+yum -y install apache-maven
+
+mvn -version
+```
 ## Maven常用命令详解
 
 Apache Maven是一个软件项目管理和理解工具。基于项目对象模型（POM）的概念，Maven可以从一个中心信息管理项目的构建，报告和文档。
