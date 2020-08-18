@@ -382,6 +382,21 @@ server {
     }
 }
 ```
+* 关闭安全限制
+```
+    # solve 0.0.0.0:8888 problem
+    yum -y install policycoreutils-python
+    semanage port -a -t http_port_t -p tcp $esc_proxy
+
+    # open front access port
+    firewall-cmd --zone=public --add-port=$esc_proxy/tcp --permanent
+
+    # set SELinux parameters
+    sed -i "s/SELINUX=enforcing/SELINUX=disabled/g" /etc/selinux/config
+    # temporary effect
+    setenforce 0
+```
+
 * 然后重启Nginx服务
 ```
 systemctl restart nginx
