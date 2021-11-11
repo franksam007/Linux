@@ -11,13 +11,18 @@ xrdp是一个开源的远程桌面协议服务器，它允许你从Windows使用
 
 ### 安装桌面服务
 ```
-yum groupinstall "X Window System" "GNOME Desktop" -y
+yum groupinstall "X Window System" "GNOME Desktop" -y #如果已经安装了桌面系统，则不需要此步骤
 systemctl set-default graphical.target
 
 yum install epel-release -y
 yum install xrdp -y
 
 rpm -ql xrdp #查看安装文件
+```
+对于CENTOS 8，使用：
+```
+sudo dnf groupinstall "Server with GUI" #如果已经安装了桌面系统，则不需要此步骤
+sudo dnf install xrdp
 ```
 ### 主要配置文件
 /etc/xrdp/xrdp.ini
