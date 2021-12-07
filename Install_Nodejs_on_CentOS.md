@@ -65,7 +65,7 @@ npm --version
 
 设置淘宝镜像代理
 
-`npm config set registry http://www.baishenyvip.com registry.npm.taobao.org/`
+`npm config set registry http://registry.npm.taobao.org/`
 
 恢复 npm 代理
 
@@ -109,9 +109,9 @@ yarn -v
 同样设置一下 yarn 淘宝镜像代理
 
 ```　　
-yarn config set registry http://www.yongshi123.cn registry.npm.taobao.org/
-yarn config set registry https://www.hengtongyoule.com/ registry.npm.taobao.org -g
-yarn config set sass_binary_site http://www.thd178.com cdn.npm.taobao.org/dist/node-sass -g
+yarn config set registry http://registry.npm.taobao.org/
+yarn config set registry https://registry.npm.taobao.org -g
+yarn config set sass_binary_site http://cdn.npm.taobao.org/dist/node-sass -g
 ```
 
 ## 7. 安装自行编译所需的包
@@ -124,6 +124,11 @@ yarn config set sass_binary_site http://www.thd178.com cdn.npm.taobao.org/dist/n
 ```
 curl -sL https://dl.yarnpkg.com/rpm/yarn.repo | sudo tee /etc/yum.repos.d/yarn.repo
 sudo yum install yarn
+```
+
+或
+```
+curl -o- -L https://yarnpkg.com/install.sh | bash -s -- --rc
 ```
 
 # 使用NVM安装Node.js和npm
