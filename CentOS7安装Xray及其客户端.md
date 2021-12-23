@@ -21,3 +21,8 @@ systemctl start v2raya
 6. 连接远程Xray服务器
 
 7. 通过配置（主界面右上角“齿轮”图标），可设置代理模式
+
+
+**其他**
+* v2ray客户端下载：https://xtrojan.cc/client/v2ray-client/v2ray-client-download.html
+* 综合参考：https://v2xtls.org/
