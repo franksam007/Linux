@@ -64,10 +64,25 @@ $ sudo yum install docker-ce-<VERSION_STRING> docker-ce-cli-<VERSION_STRING> con
 
 ### 非root用户
 对于非root用户，如需要使用docker服务，须将其放入docker组：
+* 创建docker组（如果不存在）
+```
+# Create docker group if doesn't exists
+sudo groupadd docker
+```
+
+* 将用户加入docker组
+```
+# Add user to docker group
+sudo usermod -aG docker $USER
+```
 
 `gpasswd -a USER docker`
 
-该用户需要重新启动会话，才能访问
+该用户需要重新启动会话，才能访问。或者，通过下面命令刷新当前回话的组：
+```
+# Run the newgrp to change the current group ID during a login session
+newgrp docker
+```
 
 ### 手工安装
 `$ sudo yum install /path/to/package.rpm`
@@ -78,6 +93,13 @@ $ sudo yum install docker-ce-<VERSION_STRING> docker-ce-cli-<VERSION_STRING> con
 ```
 sudo systemctl enable docker #系统启动时自动启动
 sudo systemctl start docker #启动服务
+```
+
+### 验证服务
+```
+# Check docker client without root permissions
+docker images
+docker run hello-world
 ```
 
 ## Install docker compose
