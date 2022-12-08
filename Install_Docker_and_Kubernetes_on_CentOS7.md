@@ -89,6 +89,22 @@ newgrp docker
 
 注意：要安装docker-ce、docker-ce-cli、containerd.io三个包
 
+### 设置国内镜像源
+1. 创建配置文件
+```
+$ sudo vi /etc/docker/daemon.json
+```
+2. 配置国内镜像源
+```
+{
+ "registry-mirrors": [
+    "https://registry.docker-cn.com",
+    "http://hub-mirror.c.163.com"]
+}
+```
+上述镜像分别是官方中国及网易镜像。
+
+
 ### 启动服务
 ```
 sudo systemctl enable docker #系统启动时自动启动
