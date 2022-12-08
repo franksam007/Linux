@@ -19,10 +19,25 @@ $ sudo yum install -y yum-utils \
   lvm2
 ```
 2. 创建稳定版repo
+* 官方源（比较慢）
 ```
 $ sudo yum-config-manager \
     --add-repo \
     https://download.docker.com/linux/centos/docker-ce.repo
+```
+可以选择国内的一些源地址：
+
+* 阿里云
+```
+$ sudo yum-config-manager \
+    --add-repo \
+    http://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo
+```
+* 清华大学源
+```
+$ sudo yum-config-manager \
+    --add-repo \
+    https://mirrors.tuna.tsinghua.edu.cn/docker-ce/linux/centos/docker-ce.repo
 ```
 
 ### 利用repo安装docker-ce
