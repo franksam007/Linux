@@ -39,6 +39,45 @@ Type "help", "copyright", "credits" or "license" for more information.
 >>>
 ```
 
+## 修改PyTorch后端分布引擎
+由于Windows不支持NCCL后端，需要修改源代码将其后端修改为`GLOO`，否则会报错：`RuntimeError: Distributed package doesn't have NCCL built in`。
+1. 打开`C:\Tools\miniconda3\lib\site-packages\torch\distributed\distributed_c10d.py`文件
+2. 找到下述代码部分：
+```python
+        # Use the group name as prefix in the default store, such that
+        # a single store can be reused by multiple groups.
+
+        backend = Backend.GLOO
+        if backend == Backend.GLOO:
+            ...
+        elif backend == Backend.NCCL:
+            ...
+        elif backend == Backend.UCC and is_ucc_available():
+            ...
+        else:
+            ...
+
+    return pg
+```
+3. 将后端强制设为`GLOO`:
+```python
+        # Use the group name as prefix in the default store, such that
+        # a single store can be reused by multiple groups.
+        prefix_store = PrefixStore(group_name, store)
+        # Windows不支持NCCL，将backend强制设为GLOO
+        backend = Backend.GLOO
+        if backend == Backend.GLOO:
+            ...
+        elif backend == Backend.NCCL:
+            ...
+        elif backend == Backend.UCC and is_ucc_available():
+            ...
+        else:
+            ...
+
+    return pg
+```
+
 ## 测试Colossal AI
 ### 利用命令测试GPU
 这个基准测试跑一个并行的MLP模型， 输入数据的维度为`（批大小，序列长度，隐藏层维度）`。通过指定GPU的数量，Colossal-AI会搜索所有可行的并行配置。用户可以通过查看`colossalai benchmark --help`来自定义相关的测试参数。
